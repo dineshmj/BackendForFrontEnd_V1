@@ -23,6 +23,11 @@
         "DebugTarget": "IIS Express"
       },
       {
+        "Path": "src\\Microservices\\Products.WebUI\\Products.WebUI.csproj",
+        "Action": "Start",
+        "DebugTarget": "IIS Express"
+      },
+      {
         "Path": "src\\BFF.Web\\BFF.Web.csproj",
         "Action": "Start",
         "DebugTarget": "IIS Express"

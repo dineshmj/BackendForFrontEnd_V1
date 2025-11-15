@@ -30,3 +30,7 @@
    - A "consent" page must be implemented in the IDP to ask users for consent before sharing their profile data with the BFF UIs and APIs.
    - Terform scripts must be created to provision all required infrastructure in a cloud provider (e.g., Azure, AWS, GCP).
 
+12) Cookie names of BFF projects:
+   - Shell BFF UI: "__PAS-Shell-Host-bff"
+   - Products BFF UI: "__PAS-Microservice-Products-Host-bff"
+

@@ -1,8 +1,10 @@
-using Duende.Bff;
-using Duende.Bff.Yarp;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using System.IdentityModel.Tokens.Jwt;
+
+using Microsoft.AspNetCore.Authentication.Cookies;
+
+using Common;
+using Common.Microservices;
+using Duende.Bff.Yarp;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +14,8 @@ JwtSecurityTokenHandler.DefaultMapInboundClaims = false;
 // Add BFF services
 builder.Services.AddBff()
     .AddRemoteApis();
+
+builder.Services.AddSingleton<ILoginTokenService, LoginTokenService> ();
 
 // Add authentication
 builder.Services
@@ -23,16 +27,18 @@ builder.Services
     })
     .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
     {
-        options.Cookie.Name = "__Host-bff";
-        options.Cookie.SameSite = SameSiteMode.Strict;
+        options.Cookie.Name = CookieNames.PAS_SHELL_HOST_BFF; // "__PAS-Shell-Host-bff";
+		options.Cookie.SameSite = SameSiteMode.Lax; // SameSiteMode.Strict is not used becuse the app will not render inside an iFrame. Lax is used to allow iframe use case.
         options.Cookie.HttpOnly = true;
         options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
     })
     .AddOpenIdConnect("oidc", options =>
     {
-        options.Authority = builder.Configuration["IdentityServer:Authority"];
-        options.ClientId = builder.Configuration["IdentityServer:ClientId"];
-        options.ClientSecret = builder.Configuration["IdentityServer:ClientSecret"];
+        // NOTE: Replace with true configuration values in a production deployment. The "constants" here are for demo purposes only.
+
+        options.Authority = IDP.Authority;  // builder.Configuration["IdentityServer:Authority"];
+        options.ClientId = PASShellBFF.CLIENT_ID; // builder.Configuration["IdentityServer:ClientId"];
+        options.ClientSecret =  PASShellBFF.CLIENT_SECRET; // builder.Configuration["IdentityServer:ClientSecret"];
         options.ResponseType = "code";
         options.ResponseMode = "query";
 
@@ -45,10 +51,8 @@ builder.Services
         options.Scope.Add("openid");
         options.Scope.Add("profile");
         options.Scope.Add("email");
-        options.Scope.Add("orders_api");
-        options.Scope.Add("products_api");
-        options.Scope.Add("payments_api");
-        options.Scope.Add("offline_access");
+
+		options.Scope.Add("offline_access");
 
         options.TokenValidationParameters.NameClaimType = "name";
         options.TokenValidationParameters.RoleClaimType = "role";
@@ -57,20 +61,9 @@ builder.Services
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 
-// Add HTTP clients for microservices
-builder.Services.AddHttpClient("orders-api", client =>
-{
-    client.BaseAddress = new Uri(builder.Configuration["Microservices:OrdersApi"]!);
-}).AddUserAccessTokenHandler();
-
 builder.Services.AddHttpClient("products-api", client =>
 {
-    client.BaseAddress = new Uri(builder.Configuration["Microservices:ProductsApi"]!);
-}).AddUserAccessTokenHandler();
-
-builder.Services.AddHttpClient("payments-api", client =>
-{
-    client.BaseAddress = new Uri(builder.Configuration["Microservices:PaymentsApi"]!);
+    client.BaseAddress = new Uri (ProductsMicroservice.API_BASE_URL);    // builder.Configuration["Microservices:ProductsApi"]!);
 }).AddUserAccessTokenHandler();
 
 var app = builder.Build();
@@ -94,20 +87,9 @@ app.UseBff();
 app.UseAuthorization();
 
 app.MapControllers()
-    .RequireAuthorization()
-    .AsBffApiEndpoint();
+    .RequireAuthorization();
 
 app.MapBffManagementEndpoints();
-
-// Proxy endpoints to microservices
-app.MapRemoteBffApiEndpoint("/api/orders", "https://localhost:44349")
-    .RequireAccessToken(Duende.Bff.TokenType.User);
-
-app.MapRemoteBffApiEndpoint("/api/products", "https://localhost:44363")
-    .RequireAccessToken(Duende.Bff.TokenType.User);
-
-app.MapRemoteBffApiEndpoint("/api/payments", "https://localhost:44309")
-    .RequireAccessToken(Duende.Bff.TokenType.User);
 
 app.MapFallbackToFile("index.html");
 

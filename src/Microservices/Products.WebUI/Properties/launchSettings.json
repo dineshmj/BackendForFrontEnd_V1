@@ -1,0 +1,13 @@
+{
+  "profiles": {
+	"ProductsBff": {
+	  "commandName": "Project",
+	  "dotnetRunMessages": true,
+	  "launchBrowser": false,
+	  "applicationUrl": "https://localhost:54367",
+	  "environmentVariables": {
+		"ASPNETCORE_ENVIRONMENT": "Development"
+	  }
+	}
+  }
+}
