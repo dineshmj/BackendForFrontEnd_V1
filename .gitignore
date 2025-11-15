@@ -1,0 +1,15 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs
+/src/BFF.Web/bin/Debug/net8.0
+/src/BFF.Web/obj
+/src/IdentityServer/bin/Debug/net8.0
+/src/IdentityServer/obj
+/src/Microservices/Orders.API/bin/Debug/net8.0
+/src/Microservices/Orders.API/obj
+/src/Microservices/Payments.API/bin/Debug/net8.0
+/src/Microservices/Payments.API/obj
+/src/Microservices/Products.API/bin/Debug/net8.0
+/src/Microservices/Products.API/obj
