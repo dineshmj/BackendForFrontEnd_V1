@@ -13,3 +13,7 @@
 /src/Microservices/Payments.API/obj
 /src/Microservices/Products.API/bin/Debug/net8.0
 /src/Microservices/Products.API/obj
+/src/Common/bin/Debug/net8.0
+/src/Common/obj
+/src/Microservices/Products.WebUI/bin/Debug/net8.0
+/src/Microservices/Products.WebUI/obj
