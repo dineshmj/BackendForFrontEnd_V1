@@ -1,6 +1,6 @@
 1) The SPA uses Next.js 14 with the app directory structure.
 
-2) The SPA project is already compiled, bundled and exported using Next.js build tools ("npm run export"). Look at the "out" folder for the final static files.
+2) The SPA project is already built, bundled and exported using Next.js tools ("npm run export"). Look at the "out" folder for the final static files.
 
 3) The "Backend for Frontend" (BFF) server is implemented using ASP.NET Core 8.0. The BFF server serves the static files from the "out" folder and handles API requests.
 

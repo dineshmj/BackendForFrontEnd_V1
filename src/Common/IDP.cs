@@ -1,4 +1,4 @@
-﻿namespace Common
+﻿namespace FW.Landscape.Common
 {
 	public static class IDP
 	{
