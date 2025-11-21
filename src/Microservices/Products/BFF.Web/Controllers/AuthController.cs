@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using FW.Common.WebUtilties.Helpers;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,7 +15,33 @@ namespace FW.Microservices.Products.BFFWeb.Controllers
         [HttpGet("silent-login")]
         public IActionResult SilentLogin([FromQuery] string returnUrl = "/")
         {
-            var properties = new AuthenticationProperties
+            if (returnUrl.DoesNextJsRelativePathExist () == false)
+            {
+				var htmlContent =  @"
+                    <div style='padding:20px; border:1px solid #d0d8e8; background:#f7faff; color:#1a2c4e; border-radius:8px; font-family:Segoe UI,Roboto,sans-serif; max-width:500px;'>
+                        <div style='display:flex; align-items:center; font-size:18px; font-weight:600; margin-bottom:10px;'>
+                            <span style='font-size:22px; margin-right:8px;'>&#x2757;</span>
+                            Microservice Task Not Implemented
+                        </div>
+                        <div style='font-size:14px; line-height:1.6; color:#2d3e5e;'>
+                            This microservice task has not been implemented yet. Please check back later or contact the service owner.
+                        </div>
+                    </div>";
+
+				return new ContentResult
+				{
+					Content = htmlContent,
+					ContentType = "text/html",
+					StatusCode = StatusCodes.Status404NotFound
+				};
+			}
+
+			if (User?.Identity?.IsAuthenticated == true)
+			{
+				return LocalRedirect (returnUrl);
+			}
+
+			var properties = new AuthenticationProperties
             {
                 RedirectUri = returnUrl,
                 Items =

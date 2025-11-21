@@ -16,7 +16,6 @@ public sealed class ForwardController
     [HttpGet("to-microservice")]
     public IActionResult ForwardToTargetMicroserviceBFF([FromQuery] string baseUrl, [FromQuery] string relativePath)
     {
-        relativePath = "";
         var redirectUrl = $"{baseUrl}/signinoidc/signin?redirect_uri={baseUrl}{relativePath}";
         return Redirect(redirectUrl);
     }

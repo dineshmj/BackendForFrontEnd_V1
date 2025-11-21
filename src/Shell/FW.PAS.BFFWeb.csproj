@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <Compile Remove="Controllers\ApiController.cs" />
+    <Compile Remove="Controllers\ForwardController.cs" />
     <Compile Remove="Controllers\LogoutAllController.cs" />
     <Compile Remove="Entities\PasMicroservice.cs" />
   </ItemGroup>
@@ -20,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Common\FW.Landscape.Common.csproj" />
+    <ProjectReference Include="..\Common\Landscape\FW.Landscape.Common.csproj" />
   </ItemGroup>
 
 </Project>

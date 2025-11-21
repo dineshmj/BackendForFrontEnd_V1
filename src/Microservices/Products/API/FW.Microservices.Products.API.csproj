@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Common\FW.Landscape.Common.csproj" />
+    <ProjectReference Include="..\..\..\Common\Landscape\FW.Landscape.Common.csproj" />
   </ItemGroup>
 
 </Project>
