@@ -55,6 +55,9 @@ public static class Config
                     "roles"
                 },
 
+                // FIXME: Enable consent later
+                // RequireConsent = true,
+
                 RefreshTokenUsage = TokenUsage.ReUse,
                 RefreshTokenExpiration = TokenExpiration.Sliding,
                 SlidingRefreshTokenLifetime = 3600
