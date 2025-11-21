@@ -100,7 +100,7 @@ function HomeContent() {
       >
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <Image
-            src="/res/PAS.jpg"
+            src="/res/PAS.png"
             alt="Platform Administration System Logo"
             style={{ height: '100px', width: 'auto', borderRadius: '12px' }}
           />
