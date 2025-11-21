@@ -1,16 +1,18 @@
-using Duende.IdentityServer.Events;
-using Duende.IdentityServer.Extensions;
-using Duende.IdentityServer.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
+using Duende.IdentityServer.Events;
+using Duende.IdentityServer.Extensions;
+using Duende.IdentityServer.Services;
+
 namespace FW.IDP.Pages.Account;
 
 [SecurityHeaders]
 [AllowAnonymous]
-public class LogoutModel : PageModel
+public sealed class LogoutModel
+    : PageModel
 {
     private readonly IIdentityServerInteractionService _interaction;
     private readonly IEventService _events;
@@ -31,9 +33,6 @@ public class LogoutModel : PageModel
 
     public async Task<IActionResult> OnGet(string? logoutId)
     {
-		//Input = new InputModel { LogoutId = logoutId };
-		//return Page();
-
 		Input = new InputModel { LogoutId = logoutId };
 		return await OnPost ();
 	}

@@ -1,18 +1,19 @@
 'use client';
 
 import { useAuth } from '../hooks/useAuth';
+import { config } from '../../app.config.json';
 
 interface AuthGuardProps {
   children: React.ReactNode;
   loadingComponent?: React.ReactNode;
 }
 
-/**
+/*
  * Component that protects routes requiring authentication
  * Automatically redirects to login if user is not authenticated
  */
 export function AuthGuard({ children, loadingComponent }: AuthGuardProps) {
-  const { isAuthenticated, isLoading } = useAuth(true);
+  const { isAuthenticated, isLoading, showLoginMessage } = useAuth(true);
 
   if (isLoading) {
     return (
@@ -49,6 +50,19 @@ export function AuthGuard({ children, loadingComponent }: AuthGuardProps) {
   // If not authenticated, useAuth hook will redirect
   // Only render children if authenticated
   if (!isAuthenticated) {
+    if (showLoginMessage) {
+      const navigateToPmsLoginUrl = config.pmsLoginUrl;
+      return (
+        <div style={{ padding: '2rem', fontFamily: 'system-ui', textAlign: 'center' }}>
+          <h1>Authentication Required</h1>
+          
+          <p>
+            User is not authenticated. Please login from
+             <a href={navigateToPmsLoginUrl} style={{ marginLeft: '0.5rem' }}>Platform Management System</a>.
+          </p>
+        </div>
+      );
+    }
     return null;
   }
 

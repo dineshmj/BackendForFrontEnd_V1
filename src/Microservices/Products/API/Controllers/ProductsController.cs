@@ -1,58 +1,43 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+using FW.Microservices.Products.API.DBAccess;
+
 namespace FW.Microservices.Products.API.Controllers;
 
 [Authorize]
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
 public sealed class ProductsController
     : ControllerBase
 {
     private readonly ILogger<ProductsController> _logger;
+    private readonly IProductRepository _productRepository;
 
-    public ProductsController(ILogger<ProductsController> logger)
+    public ProductsController(ILogger<ProductsController> logger, IProductRepository productRepository)
     {
         _logger = logger;
+        _productRepository = productRepository;
     }
 
     [HttpGet]
-    public IActionResult Get()
+    [Route("get-all")]
+    public async Task<IActionResult> Get()
     {
-        var userId = User.FindFirst("sub")?.Value ?? "unknown";
-        var userName = User.FindFirst("name")?.Value ?? "Unknown User";
-        
-        _logger.LogInformation("Products requested by user: {UserId}", userId);
-        
-        return Ok(new
-        {
-            Message = "Products retrieved successfully",
-            UserId = userId,
-            UserName = userName,
-            Products = new[]
-            {
-                new { Id = 1, Name = "Laptop Pro", Price = 1299.99, Stock = 45, Category = "Electronics" },
-                new { Id = 2, Name = "Wireless Mouse", Price = 29.99, Stock = 150, Category = "Accessories" },
-                new { Id = 3, Name = "Mechanical Keyboard", Price = 89.99, Stock = 78, Category = "Accessories" },
-                new { Id = 4, Name = "USB-C Hub", Price = 49.99, Stock = 92, Category = "Accessories" },
-                new { Id = 5, Name = "Monitor 27\"", Price = 399.99, Stock = 23, Category = "Electronics" }
-            }
-        });
+        var result = _productRepository.GetAllProductsAsync().Result;
+        return Ok (result);
     }
 
     [HttpGet("{id}")]
     public IActionResult GetById(int id)
     {
-        var userId = User.FindFirst("sub")?.Value ?? "unknown";
-        
-        return Ok(new
+        var matchingProduct = _productRepository.GetProductByIdAsync(id);
+
+        if (matchingProduct == null)
         {
-            Id = id,
-            UserId = userId,
-            Name = "Sample Product",
-            Price = 99.99,
-            Stock = 100,
-            Category = "General"
-        });
+            return NotFound();
+        }
+
+        return Ok(matchingProduct);
     }
 }

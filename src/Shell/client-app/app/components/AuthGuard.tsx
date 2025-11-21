@@ -7,7 +7,7 @@ interface AuthGuardProps {
   loadingComponent?: React.ReactNode;
 }
 
-/**
+/*
  * Component that protects routes requiring authentication
  * Automatically redirects to login if user is not authenticated
  */

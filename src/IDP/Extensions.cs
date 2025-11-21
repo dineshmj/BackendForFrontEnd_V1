@@ -1,6 +1,7 @@
-using Duende.IdentityServer.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+
+using Duende.IdentityServer.Models;
 
 namespace FW.IDP;
 

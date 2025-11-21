@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { checkAuthentication, redirectToLogin, type AuthState } from '../lib/auth';
+import { checkAuthentication, type AuthState } from '../lib/auth';
 
-/**
+/*
  * Custom hook for authentication
  * Automatically checks auth status and redirects to login if not authenticated
  */
@@ -13,20 +13,20 @@ export function useAuth(autoRedirect: boolean = true) {
     user: null,
     isLoading: true,
   });
-
+  const [showLoginMessage, setShowLoginMessage] = useState(false);
+  
   useEffect(() => {
-    const checkAuth = async () => {
+    const loadConfigAndCheckAuth = async () => {
       const state = await checkAuthentication();
       setAuthState(state);
 
-      // Auto-redirect to login if not authenticated
       if (autoRedirect && !state.isAuthenticated && !state.isLoading) {
-        redirectToLogin();
+        setShowLoginMessage(true);
       }
     };
 
-    checkAuth();
+    loadConfigAndCheckAuth();
   }, [autoRedirect]);
 
-  return authState;
+  return { ...authState, showLoginMessage };
 }

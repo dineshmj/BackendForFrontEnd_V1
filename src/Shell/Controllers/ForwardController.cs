@@ -1,10 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-using FW.Landscape.Common.Microservices;
-using FW.PAS.BFFWeb.Entities;
-using FW.PAS.BFFWeb.Services;
-
 namespace FW.PAS.BFFWeb.Controllers;
 
 [Authorize]
@@ -13,23 +9,30 @@ namespace FW.PAS.BFFWeb.Controllers;
 public sealed class ForwardController
 	: ControllerBase
 {
-	private readonly ILoginTokenService _loginTokenService;
-
-	public ForwardController (ILoginTokenService loginTokenService)
+	public ForwardController ()
 	{
-		_loginTokenService = loginTokenService;
 	}
 
-	[HttpGet ("products")]
-	public IActionResult ForwardProducts ()
-	{
-		// Mint short-lived token
-		var loginToken = _loginTokenService.CreateLoginToken (base.User, PasMicroservice.Products);
+    [HttpGet("to-microservice")]
+    public IActionResult ForwardToTargetMicroserviceBFF([FromQuery] string baseUrl, [FromQuery] string relativePath)
+    {
+        relativePath = "";
+        var redirectUrl = $"{baseUrl}/signinoidc/signin?redirect_uri={baseUrl}{relativePath}";
+        return Redirect(redirectUrl);
+    }
 
-		// Redirect to Products BFF step
-		var redirectUrl =
-			$"{ProductsMicroservice.CLIENT_BASE_URL}/receive-login?token={loginToken}";
+    [HttpGet("{**any}")]
+    public IActionResult ForwardingNotFound()
+    {
+        string htmlContent = "<div style='padding: 20px; border: 1px solid #1a2c4e; background-color: #e6f0ff; color: #1a2c4e; border-radius: 5px; font-family: sans-serif;'>" +
+                             "<strong>❗ Task Not Implemented:</strong> This microservice task is yet to be implemented or the route is incorrect." +
+                             "</div>";
 
-		return Redirect (redirectUrl);
-	}
+        return new ContentResult
+        {
+            Content = htmlContent,
+            ContentType = "text/html",
+            StatusCode = StatusCodes.Status404NotFound
+        };
+    }
 }

@@ -3,7 +3,8 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace FW.IDP;
 
-public class SecurityHeadersAttribute : ActionFilterAttribute
+public sealed class SecurityHeadersAttribute
+    : ActionFilterAttribute
 {
     public override void OnResultExecuting(ResultExecutingContext context)
     {

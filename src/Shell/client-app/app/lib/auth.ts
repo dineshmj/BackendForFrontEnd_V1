@@ -9,7 +9,7 @@ export interface AuthState {
   isLoading: boolean;
 }
 
-/**
+/*
  * Check if user is authenticated by calling BFF user endpoint
  */
 export async function checkAuthentication(): Promise<AuthState> {
@@ -49,7 +49,7 @@ export async function checkAuthentication(): Promise<AuthState> {
   }
 }
 
-/**
+/*
  * Redirect to BFF login endpoint
  */
 export function redirectToLogin(): void {
@@ -57,13 +57,7 @@ export function redirectToLogin(): void {
   window.location.href = `/bff/login?returnUrl=${encodeURIComponent(returnUrl)}`;
 }
 
-export function redirectAllToLogout(): void {
-    // ↓↓ NOT WORKING!
-    // The call goes to the Shell BFF "LogoutAllController", however, the C# code over the seems to be incorrect.
-    window.location.href = "/bff/logout-all";
-}
-
-/**
+/*
  * Redirect to BFF logout endpoint
  */
 export function redirectToLogout(claims: BffUser[]): void {
@@ -88,7 +82,7 @@ export function redirectToLogout(claims: BffUser[]): void {
   window.location.href = logoutUrl;
 }
 
-/**
+/*
  * Get claim value by type
  */
 export function getClaimValue(claims: BffUser[], claimType: string): string | null {
@@ -96,7 +90,7 @@ export function getClaimValue(claims: BffUser[], claimType: string): string | nu
   return claim ? claim.value : null;
 }
 
-/**
+/*
  * Get user display name from claims
  */
 export function getUserDisplayName(claims: BffUser[]): string {

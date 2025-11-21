@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { checkAuthentication, redirectToLogin, type AuthState } from '../lib/auth';
 
-/**
+/*
  * Custom hook for authentication
  * Automatically checks auth status and redirects to login if not authenticated
  */

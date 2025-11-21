@@ -1,9 +1,10 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import ErrorBoundary from './components/ErrorBoundary';
 
 export const metadata: Metadata = {
-  title: 'Products Microservice - Frontend',
-  description: 'Products Microservice Frontend - Backend for Frontend with NextJS and ASP.NET Core',
+  title: 'Products Microsrevice BFF',
+  description: 'Next.js BFF for Products Microservice',
 };
 
 export default function RootLayout({
@@ -13,7 +14,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <ErrorBoundary>{children}</ErrorBoundary>
+      </body>
     </html>
   );
 }

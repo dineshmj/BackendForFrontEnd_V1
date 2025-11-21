@@ -1,10 +1,7 @@
 ﻿'use client';
 
 import { redirectToLogout, getUserDisplayName, type BffUser } from '../lib/auth';
-
-// ↓↓ NOT WORKING!
-// The "onClick" handler below does not work if we import "redirectAllToLogout" instead of "redirectToLogout".
-// import { redirectAllToLogout, getUserDisplayName, type BffUser } from '../lib/auth';
+import { getVisitedMicroservices } from '../lib/auth-utils';
 
 interface UserProfileProps {
   claims: BffUser[];
@@ -13,38 +10,59 @@ interface UserProfileProps {
 export function UserProfile({ claims }: UserProfileProps) {
   const displayName = getUserDisplayName(claims);
 
+  const handleLogout = async () => {
+    const microservices = getVisitedMicroservices();
+    for (const baseURL of microservices) {
+      try {
+        const response = await fetch(`${baseURL}/api/auth/silent-logout`, {
+          method: 'POST',
+          credentials: 'include',
+        });
+        if (response.status !== 200) {
+          console.warn(`Logout failed for ${baseURL} with status: ${response.status}`);
+        }
+      } catch (error) {
+        console.error(`Error during logout for ${baseURL}:`, error);
+      }
+    }
+    redirectToLogout(claims);
+  };
+
   return (
-    <div style={{
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      padding: '1rem',
-      backgroundColor: '#f8f9fa',
+    <table style={{
+      borderCollapse: 'collapse',
+      backgroundColor: '#f8f8f8',
       borderRadius: '8px',
-      marginBottom: '2rem'
+      padding: '0.5rem',
+      width: '100%',
     }}>
-      <div>
-        <span style={{ fontSize: '0.9rem', color: '#6c757d' }}>Logged in as:</span>
-        <strong style={{ marginLeft: '0.5rem', fontSize: '1.1rem' }}>{displayName}</strong>
-      </div>
-      <button
-        onClick={() => redirectToLogout(claims)}
-        // ↓↓ NOT WORKING!
-        // The below call causes a BFF call to go to the "LogoutAllController" in the Shell BFF, however, the C# code over there seems to be incorret.
-        // onClick={() => redirectAllToLogout()}
-        style={{
-          padding: '0.5rem 1rem',
-          backgroundColor: '#dc3545',
-          color: 'white',
-          border: 'none',
-          borderRadius: '5px',
-          cursor: 'pointer',
-          fontSize: '0.95rem',
-          fontWeight: '500'
-        }}
-      >
-        Logout
-      </button>
-    </div>
+      <tbody>
+        <tr>
+          <td style={{ padding: '0.25rem 0', fontSize: '1rem', color: '#6c757d' }}>
+            <strong style={{ marginLeft: '0.5rem', fontSize: '1rem', color: '#343a40' }}>{displayName}</strong>
+          </td>
+        </tr>
+        <tr>
+          <td style={{ padding: '0.25rem 0' }}>
+            <button
+              onClick={handleLogout}
+              style={{
+                padding: '0.5rem 1rem',
+                backgroundColor: '#dc3545',
+                color: 'white',
+                border: 'none',
+                borderRadius: '5px',
+                cursor: 'pointer',
+                fontSize: '0.95rem',
+                fontWeight: '500',
+                width: '100%',
+              }}
+            >
+              Logout
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
   );
 }

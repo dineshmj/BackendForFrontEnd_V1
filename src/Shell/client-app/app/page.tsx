@@ -1,9 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AuthGuard } from './components/AuthGuard';
 import { UserProfile } from './components/UserProfile';
+import Image from 'next/image';
+import { MicroserviceAccordion } from './components/MicroserviceAccordion';
 import { useAuth } from './hooks/useAuth';
+import { MenuResponse, MenuItem } from './types';
+import { addVisitedMicroservice } from './lib/auth-utils';
 
 export default function Home() {
   return (
@@ -17,13 +21,14 @@ function HomeContent() {
   const { user } = useAuth(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [menuData, setMenuData] = useState<MenuResponse | null>(null);
+  const [expandedIndex, setExpandedIndex] = useState<number>(0);
 
-  if (!user) return null;
+  const handleToggle = (index: number) => {
+    setExpandedIndex(index === expandedIndex ? -1 : index);
+  };
 
-  // -------------------------------------------------------
-  // LOAD PRODUCTS MICRO-FRONTEND (via iframe + BFF forward)
-  // -------------------------------------------------------
-  const loadProductsIframe = () => {
+  const handleMenuItemClick = (item: MenuItem) => {
     setError(null);
     setLoading(true);
 
@@ -35,35 +40,114 @@ function HomeContent() {
       return;
     }
 
-    // 🔥 This triggers:
-    // Shell BFF → ForwardController → Products BFF → ReceiveLogin → /webUI
-    iframe.src = '/bff/forward/products';
+    if (!item.baseURL) {
+      setError('Internal error: baseURL not found for the selected microservice.');
+      setLoading(false);
+      return;
+    }
+    addVisitedMicroservice(item.baseURL);
+
+    const silentLoginUrl = `${item.baseURL}/api/auth/silent-login?returnUrl=${encodeURIComponent(item.urlRelativePath)}`;
+    iframe.src = silentLoginUrl;
 
     iframe.onload = () => {
       setLoading(false);
     };
   };
 
+  const loadMenu = async () => {
+    try {
+      const response = await fetch('/bff/api/Menu/Authorized', {
+        credentials: 'include', // Important for sending cookies/auth headers in BFF context
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data: MenuResponse = await response.json();
+      setMenuData(data);
+    } catch (e) {
+      console.error('Failed to load menu:', e);
+    }
+  };
+  
+  useEffect(() => {
+    loadMenu();
+  }, []);
+
+  if (!user) return null;
+
   return (
     <div
       style={{
-        padding: '2rem',
         fontFamily: 'system-ui, sans-serif',
-        maxWidth: '1200px',
-        margin: '0 auto',
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
       }}
     >
-      <h1 style={{ marginBottom: '1.5rem' }}>Policy Administration System</h1>
+      {/* HEADER: Logo | Title | Logout */}
+      <header
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '100px 1fr auto',
+          alignItems: 'center',
+          padding: '1rem 2rem',
+          borderBottom: '1px solid #ccc',
+          backgroundColor: '#f8f8f8',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <Image
+            src="/res/PAS.jpg"
+            alt="Platform Administration System Logo"
+            style={{ height: '100px', width: 'auto', borderRadius: '12px' }}
+          />
+        </div>
+        <h1 style={{ margin: 1, marginLeft: '2rem', fontSize: '2rem' }}>
+          Platform Administration System
+        </h1>
+        {/* USER PROFILE (Contains Logout) */}
+        <UserProfile claims={user} />
+      </header>
 
-      {/* USER PROFILE */}
-      <UserProfile claims={user} />
+      {/* MAIN CONTENT: Menu | Iframe */}
+      <main
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '300px 1fr',
+          flexGrow: 1,
+          overflow: 'hidden',
+        }}
+      >
+        {/* LEFT COLUMN: DYNAMIC MENU */}
+        <div
+          style={{
+            padding: '1rem 2rem',
+            borderRight: '1px solid #ccc',
+            overflowY: 'auto',
+          }}
+        >
+          {menuData?.microservices.map((microservice, index) => (
+            <MicroserviceAccordion
+              key={microservice.name}
+              microservice={microservice}
+              isExpanded={index === expandedIndex}
+              onToggle={() => handleToggle(index)}
+              handleMenuItemClick={handleMenuItemClick}
+              loading={loading}
+            />
+          ))}
+        </div>
 
-      {/* ERROR BOX */}
-      {error && (
+        {/* RIGHT COLUMN: IFRAME SECTION & ERROR BOX */}
+        <div style={{ padding: '1rem', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+          {error && (
         <div
           style={{
             padding: '1rem',
-            marginTop: '1rem',
+            marginBottom: '1rem',
             backgroundColor: '#fee',
             color: '#c00',
             borderRadius: '5px',
@@ -74,59 +158,21 @@ function HomeContent() {
         </div>
       )}
 
-      {/* ONLY ONE BUTTON */}
-      <div style={{ marginTop: '2rem' }}>
-        <button
-          onClick={loadProductsIframe}
-          disabled={loading}
-          style={{
-            padding: '0.75rem 1.5rem',
-            backgroundColor: loading ? '#ccc' : '#2563eb',
-            color: 'white',
-            border: 'none',
-            borderRadius: '5px',
-            cursor: loading ? 'not-allowed' : 'pointer',
-            fontSize: '1rem',
-          }}
-        >
-          {loading ? 'Loading Products UI…' : 'Show Products UI'}
-        </button>
-      </div>
-
       {/* IFRAME SECTION */}
-      <div style={{ marginTop: '3rem' }}>
+      <div style={{ flexGrow: 1 }}>
         <iframe
           id="microservice-frame"
           style={{
             width: '100%',
-            height: '600px',
+            height: '100%', // Use 100% height of the parent container
             border: '1px solid #ccc',
             borderRadius: '5px',
           }}
         />
       </div>
-
-      {/* USER CLAIMS
-      <div
-        style={{
-          marginTop: '3rem',
-          padding: '1.5rem',
-          backgroundColor: '#e7f3ff',
-          borderRadius: '8px',
-          border: '1px solid #b3d9ff',
-        }}
-      >
-        <h3 style={{ marginTop: 0, color: '#004085' }}>User Claims</h3>
-
-        <ul style={{ margin: 0, paddingLeft: '1.5rem' }}>
-          {user.map((claim, index) => (
-            <li key={index} style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>
-              <strong>{claim.type}:</strong>{' '}
-              <span style={{ color: '#495057' }}>{claim.value}</span>
-            </li>
-          ))}
-        </ul>
-      </div> */}
     </div>
+  </main>
+  </div>
+
   );
 }

@@ -1,5 +1,10 @@
-using FW.IDP;
+using Microsoft.EntityFrameworkCore;
+
 using Serilog;
+
+using FW.IDP.DBAccess;
+using FW.IDP.Security;
+using FW.IDP.Services;
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
@@ -16,7 +21,26 @@ try
         .Enrich.FromLogContext()
         .ReadFrom.Configuration(ctx.Configuration));
 
+    builder.Services.AddDbContext<IdentityDbContext>(options =>
+        options.UseSqlite(builder.Configuration.GetConnectionString("IdentityDbConnection")));
+
+    builder.Services.AddScoped<IUserRepository, UserRepository>();
+    builder.Services.AddScoped<IPasswordManager, PasswordManager>();
+
     builder.Services.AddRazorPages();
+
+    builder.Services.ConfigureApplicationCookie(options =>
+    {
+        options.Cookie.SameSite = SameSiteMode.None;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        options.Cookie.IsEssential = true;
+    });
+
+    builder.Services.Configure<CookiePolicyOptions>(options =>
+    {
+        options.MinimumSameSitePolicy = SameSiteMode.None;
+        options.Secure = CookieSecurePolicy.Always;
+    });
 
     builder.Services.AddIdentityServer(options =>
         {
@@ -25,11 +49,17 @@ try
             options.Events.RaiseFailureEvents = true;
             options.Events.RaiseSuccessEvents = true;
             options.EmitStaticAudienceClaim = true;
+
+            options.Authentication.CookieSameSiteMode = SameSiteMode.None;
+            options.Authentication.CookieLifetime = TimeSpan.FromHours(10);
         })
         .AddInMemoryIdentityResources(Config.IdentityResources)
         .AddInMemoryApiScopes(Config.ApiScopes)
+        .AddInMemoryApiResources (Config.ApiResources)
         .AddInMemoryClients(Config.Clients)
-        .AddTestUsers(TestUsers.Users);
+        .AddResourceOwnerValidator<CustomResourceOwnerPasswordValidator>()
+        .AddProfileService<CustomProfileService>()
+        .AddDeveloperSigningCredential();
 
     var app = builder.Build();
 
@@ -42,6 +72,7 @@ try
 
     app.UseStaticFiles();
     app.UseRouting();
+    app.UseCookiePolicy();
     app.UseIdentityServer();
     app.UseAuthorization();
     app.MapRazorPages();

@@ -7,13 +7,26 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Controllers\ApiController.cs" />
+    <Compile Remove="Controllers\LogoutAllController.cs" />
+    <Compile Remove="Security\TokenService.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Duende.BFF" Version="3.0.0" />
     <PackageReference Include="Duende.BFF.Yarp" Version="3.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="8.0.21" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.22" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\Common\FW.Landscape.Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Security\" />
+    <Folder Include="Services\" />
   </ItemGroup>
 
 </Project>
