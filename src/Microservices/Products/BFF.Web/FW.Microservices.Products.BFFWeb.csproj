@@ -7,9 +7,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Security\**" />
+    <Compile Remove="Services\**" />
+    <Content Remove="Security\**" />
+    <Content Remove="Services\**" />
+    <EmbeddedResource Remove="Security\**" />
+    <EmbeddedResource Remove="Services\**" />
+    <None Remove="Security\**" />
+    <None Remove="Services\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Remove="Controllers\ApiController.cs" />
     <Compile Remove="Controllers\LogoutAllController.cs" />
-    <Compile Remove="Security\TokenService.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -23,11 +33,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\Common\Landscape\FW.Landscape.Common.csproj" />
     <ProjectReference Include="..\..\..\Common\WebUtilities\FW.Common.WebUtilties.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Security\" />
-    <Folder Include="Services\" />
   </ItemGroup>
 
 </Project>

@@ -83,10 +83,10 @@ INSERT INTO MenuItemsAndRoles (MenuItemID, RoleShortName) VALUES ((SELECT ID FRO
 INSERT INTO MenuItems (TaskName, UrlRelativePath, IconName, ManagementAreaID) VALUES ('Delete Product', '/v1/catalog/delete', 'fa-trash', (SELECT ID FROM ManagementArea WHERE Name = 'Product Catalog'));
 INSERT INTO MenuItemsAndRoles (MenuItemID, RoleShortName) VALUES ((SELECT ID FROM MenuItems WHERE TaskName = 'Delete Product'), 'products_admin');
 
-INSERT INTO MenuItems (TaskName, UrlRelativePath, IconName, ManagementAreaID) VALUES ('View Categories', '/v1/categories/view', 'fa-tags', (SELECT ID FROM ManagementArea WHERE Name = 'Category Management'));
-INSERT INTO MenuItemsAndRoles (MenuItemID, RoleShortName) VALUES ((SELECT ID FROM MenuItems WHERE TaskName = 'View Categories'), 'products_viewer');
-INSERT INTO MenuItemsAndRoles (MenuItemID, RoleShortName) VALUES ((SELECT ID FROM MenuItems WHERE TaskName = 'View Categories'), 'products_contributor');
-INSERT INTO MenuItemsAndRoles (MenuItemID, RoleShortName) VALUES ((SELECT ID FROM MenuItems WHERE TaskName = 'View Categories'), 'products_admin');
+INSERT INTO MenuItems (TaskName, UrlRelativePath, IconName, ManagementAreaID) VALUES ('View All Categories', '/v1/categories/view-all', 'fa-tags', (SELECT ID FROM ManagementArea WHERE Name = 'Category Management'));
+INSERT INTO MenuItemsAndRoles (MenuItemID, RoleShortName) VALUES ((SELECT ID FROM MenuItems WHERE TaskName = 'View All Categories'), 'products_viewer');
+INSERT INTO MenuItemsAndRoles (MenuItemID, RoleShortName) VALUES ((SELECT ID FROM MenuItems WHERE TaskName = 'View All Categories'), 'products_contributor');
+INSERT INTO MenuItemsAndRoles (MenuItemID, RoleShortName) VALUES ((SELECT ID FROM MenuItems WHERE TaskName = 'View All Categories'), 'products_admin');
 
 INSERT INTO MenuItems (TaskName, UrlRelativePath, IconName, ManagementAreaID) VALUES ('Create / Modify Categories', '/v1/categories/manage', 'fa-wrench', (SELECT ID FROM ManagementArea WHERE Name = 'Category Management'));
 INSERT INTO MenuItemsAndRoles (MenuItemID, RoleShortName) VALUES ((SELECT ID FROM MenuItems WHERE TaskName = 'Create / Modify Categories'), 'products_admin');

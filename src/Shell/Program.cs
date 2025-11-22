@@ -78,10 +78,10 @@ builder.Services
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 
-builder.Services.AddHttpClient("products-api", client =>
-{
-    client.BaseAddress = new Uri(ProductsMicroservice.API_BASE_URL);
-}).AddUserAccessTokenHandler();
+//builder.Services.AddHttpClient("products-api", client =>
+//{
+//    client.BaseAddress = new Uri(ProductsMicroservice.API_BASE_URL);
+//}).AddUserAccessTokenHandler();
 
 var app = builder.Build();
 
