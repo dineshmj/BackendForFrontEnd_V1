@@ -1,74 +1,72 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { AuthGuard } from '../../../components/AuthGuard';
 import { useAuth } from '../../../hooks/useAuth';
 import ProductsGrid from '../../../components/ProductsGrid';
-
-interface ProductsResponse {
-  message: string;
-  products: Array<{
-    id: number;
-    name: string;
-    price: number;
-    categoryName: string;
-    stockQuantity: number;
-  }>;
-}
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchProducts } from '../../../store/productsSlice';
+import type { RootState, AppDispatch } from '../../../store/store';
 
 function ProductsContent() {
   const { user } = useAuth(false);
-  const [products, setProducts] = useState<ProductsResponse | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const dispatch = useDispatch<AppDispatch>();
+  
+  const { data: products, loading, error, hasLoaded } = useSelector(
+    (state: RootState) => state.products
+  );
 
-  const fetchProducts = async () => {
-    setError(null);
-    setLoading(true);
-
-    try {
-      const response = await fetch('/bff/products', {
-        credentials: 'include',
-        headers: {
-          'X-CSRF': '1',
-        },
-      });
-
-      if (!response.ok) {
-        setError("Failed to load products");
-        return;
-      }
-
-      const data: ProductsResponse = await response.json();
-      setProducts(data);
-
-    } catch (err) {
-      console.error(err);
-      setError("Failed to load products");
-    } finally {
-      setLoading(false);
-    }
+  const handleFetch = () => {
+    dispatch(fetchProducts());
   };
 
   useEffect(() => {
-    if (user) {
-      fetchProducts();
+    // Load data if user is present AND it hasn't been loaded yet AND we don't have an existing error from a previous failed attempt
+    if (user && !hasLoaded && !error) {
+      dispatch(fetchProducts());
     }
-  }, [user]);
+  }, [user, hasLoaded, error, dispatch]);
 
   if (!user) return null;
+
+  const showGrid = products !== null;
 
   return (
     <div style={{ padding: '2rem', fontFamily: 'system-ui' }}>
       <h1>View All Products</h1>
 
-      {loading && <p>Loading products...</p>}
+      {loading && !showGrid && <p>Loading products...</p>}
       {error && (
         <div style={{ marginTop: '1rem', color: 'red' }}>
           {error}
         </div>
       )}
-      {products && <ProductsGrid products={products.products} />}
+      {showGrid ? (
+        <>
+          <ProductsGrid products={products} />
+          <button
+            onClick={handleFetch}
+            disabled={loading}
+            style={{
+              marginTop: '1rem',
+              padding: '12px 22px',
+              fontWeight: 600,
+              borderRadius: '12px',
+              border: 'none',
+              cursor: loading ? 'not-allowed' : 'pointer',
+              background: 'linear-gradient(135deg, #1e88e5, #42a5f5)',
+              color: 'white',
+              boxShadow: '0 4px 12px rgba(99, 102, 241, 0.35)',
+              transition: 'all 0.25s ease',
+              opacity: loading ? 0.65 : 1
+            }}
+          >
+            {loading ? 'Fetching...' : 'Fetch Records Again'}
+          </button>
+        </>
+      ) : (
+        !loading && !error && user && <p>No products available.</p>
+      )}
     </div>
   );
 }

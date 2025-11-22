@@ -21,6 +21,7 @@ const CategoriesGrid: React.FC<CategoriesGridProps> = ({ categories }) => {
       {categories.map((c) => (
         <div key={c.id} style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '1rem', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
           <h3 style={{ fontSize: '1.25rem', marginBottom: '0.5rem' }}>{c.name}</h3>
+          <p style={{ margin: '0.25rem 0' }}><strong>ID:</strong> {c.id}</p>
         </div>
       ))}
     </div>
