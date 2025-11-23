@@ -21,9 +21,6 @@ export interface ProductsResponse {
 export interface Category {
   id: number;
   name: string;
-  price: number;
-  categoryName: string;
-  stockQuantity: number;
 }
 
 export interface CategoriesResponse {

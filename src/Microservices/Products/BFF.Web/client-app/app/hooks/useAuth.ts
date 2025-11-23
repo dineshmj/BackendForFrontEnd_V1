@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import {
   checkAuthentication,
   type AuthState,
-  type BffUser, // <-- import this type from your auth module
+  type BffUser,
 } from '../lib/auth';
 
 interface MinimalAuthResult {
@@ -14,7 +14,7 @@ interface MinimalAuthResult {
   isLoading?: boolean;
 }
 
-// runtime type guard: checks that the value is an array and each item is a plain object.
+// Runtime type guard: checks that the value is an array and each item is a plain object.
 // If you know more about BffUser shape (e.g. has `id: string`), check those fields here.
 function isBffUserArray(value: unknown): value is BffUser[] {
   if (!Array.isArray(value)) return false;
