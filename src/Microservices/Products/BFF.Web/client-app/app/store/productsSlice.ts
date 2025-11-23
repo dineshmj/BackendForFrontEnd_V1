@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { Product, ProductsResponse } from '../types';
 
-interface ProductsState {
+export interface ProductsState {
   data: Product[] | null;
   loading: boolean;
   error: string | null;

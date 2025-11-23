@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authentication;
+﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -67,10 +67,12 @@ public sealed class LoginModel
             if (context != null)
             {
                 await _interaction.DenyAuthorizationAsync(context, AuthorizationError.AccessDenied);
+
                 if (context.IsNativeClient())
                 {
                     return this.LoadingPage(Input.ReturnUrl);
                 }
+
                 return Redirect(Input.ReturnUrl ?? "~/");
             }
             else
@@ -86,8 +88,16 @@ public sealed class LoginModel
                 var user = _userRepository.FindByUsernameAsync(Input.Username).Result;
 
                 await _events.RaiseAsync(new UserLoginSuccessEvent(user.UserName, $"{user.ID}", $"{user.FirstName} {user.LastName}"));
+				// 🡡__ WHY   : 
+				// 🡡__ IF NOT: 
+				    // 🡡__ WHY   : This event notifies IdentityServer's event pipeline that a login succeeded,
+				    //             enabling auditing, diagnostics, monitoring hooks, and security log tracking.
+				    // 🡡__ IF NOT: Successful logins will not appear in audit/event logs, reducing traceability
+				    //             and making security incident investigations or login failure analysis harder.
 
-                AuthenticationProperties? props = null;
+
+				AuthenticationProperties? props = null;
+
                 if (Input.RememberLogin)
                 {
                     props = new AuthenticationProperties
@@ -103,8 +113,14 @@ public sealed class LoginModel
                 };
 
                 await HttpContext.SignInAsync(isuser, props);
+				    // 🡡__ WHY   : This issues the authentication cookie for the user, creating their local login
+				    //             session inside IdentityServer. All subsequent authorize requests depend on this
+				    //             cookie to identify the user and provide SSO/session continuity.
+				    // 🡡__ IF NOT: The user will not actually be signed in, meaning the authorization flow will
+				    //             immediately fail or re-prompt for login. No Single-Sign-On will work, and all
+				    //             downstream OIDC flows depending on an authenticated user will break.
 
-                if (context != null)
+				if (context != null)
                 {
                     if (context.IsNativeClient())
                     {

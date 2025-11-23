@@ -1,8 +1,9 @@
-﻿using FW.Common.WebUtilties.Helpers;
-using Microsoft.AspNetCore.Authentication;
+﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
+using FW.Common.WebUtilties.Helpers;
 
 namespace FW.Microservices.Products.BFFWeb.Controllers
 {

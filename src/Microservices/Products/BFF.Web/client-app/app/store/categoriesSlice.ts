@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { Category, CategoriesResponse } from '../types';
 
-interface CategoriesState {
+export interface CategoriesState {
   data: Category[] | null;
   loading: boolean;
   error: string | null;

@@ -26,23 +26,31 @@ public sealed class CustomProfileService
 
         if (user == null)
         {
-            context.IssuedClaims = new List<Claim>();
+            context.IssuedClaims = [];
             return;
         }
 
         var claims = new List<Claim>
         {
-            new Claim(JwtClaimTypes.Subject, user.ID.ToString()),
-            new Claim(JwtClaimTypes.Name, $"{user.FirstName} {user.LastName}"),
-            new Claim(JwtClaimTypes.GivenName, user.FirstName),
-            new Claim(JwtClaimTypes.FamilyName, user.LastName),
-            new Claim(JwtClaimTypes.Email, user.Email),
-            new Claim(JwtClaimTypes.EmailVerified, "true")
+            new(JwtClaimTypes.Subject, user.ID.ToString()),
+            new(JwtClaimTypes.Name, $"{user.FirstName} {user.LastName}"),
+            new(JwtClaimTypes.GivenName, user.FirstName),
+            new(JwtClaimTypes.FamilyName, user.LastName),
+            new(JwtClaimTypes.Email, user.Email),
+            new(JwtClaimTypes.EmailVerified, "true")
         };
 
         if (context.RequestedClaimTypes.Contains(JwtClaimTypes.Role))
-        {
-            var roles = await _userRepository.GetRolesByUserIDAsync(user.ID);
+		    // 🡡__ WHY   : Roles must only be added when explicitly requested by the client,
+		    //             which prevents unnecessary claim bloat and keeps tokens smaller and
+		    //             more secure. It also aligns with IdentityServer’s principle that
+		    //             only requested scopes/claims should be emitted.
+		    // 🡡__ IF NOT: If roles are always included even when not requested, every token
+		    //             will carry role information unnecessarily, increasing token size,
+		    //             leaking role metadata to clients that did not ask for it, and
+		    //             potentially violating least-privilege design or privacy rules.
+		{
+			var roles = await _userRepository.GetRolesByUserIDAsync(user.ID);
 
             foreach (var role in roles)
             {
@@ -55,7 +63,8 @@ public sealed class CustomProfileService
 
     public Task IsActiveAsync(IsActiveContext context)
     {
-        context.IsActive = !string.IsNullOrWhiteSpace(context.Subject.GetSubjectId());
+		// Here you can implement custom logic to determine if the user is active (by checking if the user exists, is not locked out, etc.)
+		context.IsActive = !string.IsNullOrWhiteSpace(context.Subject.GetSubjectId());
         return Task.CompletedTask;
     }
 }
