@@ -33,3 +33,9 @@
 /src/Common/Landscape/obj
 /src/Common/WebUtilities/obj
 /src/Common/WebUtilities/bin/Debug/net8.0
+/src/IDP/bin/Debug/net10.0
+/src/Microservices/Products/API/bin/Debug/net10.0
+/src/Common/Landscape/bin/Debug/net10.0
+/src/Common/WebUtilities/bin/Debug/net10.0
+/src/Microservices/Products/BFF.Web/bin/Debug/net10.0
+/src/Shell/bin/Debug/net10.0
