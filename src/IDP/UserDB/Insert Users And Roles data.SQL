@@ -83,14 +83,14 @@ INSERT INTO UsersAndRoles (UserID, RoleID) VALUES ((SELECT ID FROM Users WHERE U
 -- =========================================================
 SELECT
 	u.ID AS UserID,
-	CONCAT (u.FirstName, ' ', u.LastName),
-	r.ID as RoleID,
-	r.ShortName,
-	r.name
+	CONCAT (u.FirstName, ' ', u.LastName) AS UserFullName,
+	r.ID AS RoleID,
+	r.ShortName AS RoleShortName,
+	r.name AS RoleDescription
 FROM
 	Users AS u
-		INNER JOIN UsersAndRoles as ur on u.ID = ur.UserID
-		INNER JOIN Roles as r on ur.RoleID = r.ID
+		INNER JOIN UsersAndRoles AS ur ON u.ID = ur.UserID
+		INNER JOIN Roles AS r ON ur.RoleID = r.ID
 ORDER BY
 	u.ID,
 	r.ID

@@ -111,19 +111,19 @@ SELECT
 	ms.ID AS MicroserviceID,
     ms.BaseURL,
     ma.Name AS ManagementAreaName,
-	ma.ID as ManagementAreaID,
+	ma.ID AS ManagementAreaID,
     mi.TaskName,
 	mi.ID AS TaskID,
     mi.UrlRelativePath,
     mra.RoleShortName
 FROM
-    Microservices ms
+    Microservices AS ms
 INNER JOIN
-    ManagementArea ma ON ms.ID = ma.MicroserviceID
+    ManagementArea AS ma ON ms.ID = ma.MicroserviceID
 INNER JOIN
-    MenuItems mi ON ma.ID = mi.ManagementAreaID
+    MenuItems AS mi ON ma.ID = mi.ManagementAreaID
 INNER JOIN
-    MenuItemsAndRoles mra ON mi.ID = mra.MenuItemID
+    MenuItemsAndRoles AS mra ON mi.ID = mra.MenuItemID
 ORDER BY
     ms.Name,
     ma.Name,

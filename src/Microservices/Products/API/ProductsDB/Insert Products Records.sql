@@ -73,11 +73,11 @@ SELECT
     p.Price,
     i.StockQuantity
 FROM
-    Products p
+    Products AS p
 INNER JOIN
-    Categories c ON p.CategoryID = c.ID
+    Categories AS c ON p.CategoryID = c.ID
 INNER JOIN
-    Inventory i ON p.ID = i.ProductID
+    Inventory AS i ON p.ID = i.ProductID
 ORDER BY
     c.Name,
     p.Name;

@@ -70,8 +70,8 @@ public static class Config
                     "roles"
                 },
 
-                // FIXME: Enable consent later
-                // RequireConsent = true,
+                // For the Shell application, show the content page.
+                RequireConsent = true,
 
                 RefreshTokenUsage = TokenUsage.ReUse,
                     // 🡡__ WHY   : ReUse leaves the same refresh token valid for multiple refresh operations until it expires. This reduces storage
