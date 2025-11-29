@@ -55,6 +55,7 @@ CREATE TABLE "MenuItemsAndRoles" (
 -- Insert data into table: Microservices
 -- =========================================================
 INSERT INTO Microservices (Name, BaseURL) VALUES ('Products', 'https://localhost:44311');
+INSERT INTO Microservices (Name, BaseURL) VALUES ('Orders', 'https://localhost:33800');
 
 -- =========================================================
 -- Insert data into table: ManagementArea
@@ -65,9 +66,16 @@ INSERT INTO ManagementArea (Name, Description, MicroserviceID) VALUES
 ('Inventory & Logistics', 'Track stock levels and manage warehouse movements.', (SELECT ID FROM Microservices WHERE Name = 'Products')),
 ('Settings', 'Configure core product microservice parameters.', (SELECT ID FROM Microservices WHERE Name = 'Products'));
 
+INSERT INTO ManagementArea (Name, Description, MicroserviceID) VALUES
+('Orders', 'Manage orders', (SELECT ID FROM Microservices WHERE Name = 'Orders')),
+('Delivery', 'Manage delivery of orders.', (SELECT ID FROM Microservices WHERE Name = 'Orders'));
+
 -- =========================================================
 -- Insert data into table: MenuItems, MenuItemsAndRoles
 -- =========================================================
+--
+-- Products
+--
 INSERT INTO MenuItems (TaskName, UrlRelativePath, IconName, ManagementAreaID) VALUES ('View All Products', '/v1/catalog/view-all', 'fa-list', (SELECT ID FROM ManagementArea WHERE Name = 'Product Catalog'));
 INSERT INTO MenuItemsAndRoles (MenuItemID, RoleShortName) VALUES ((SELECT ID FROM MenuItems WHERE TaskName = 'View All Products'), 'products_viewer');
 INSERT INTO MenuItemsAndRoles (MenuItemID, RoleShortName) VALUES ((SELECT ID FROM MenuItems WHERE TaskName = 'View All Products'), 'products_contributor');
@@ -102,6 +110,15 @@ INSERT INTO MenuItemsAndRoles (MenuItemID, RoleShortName) VALUES ((SELECT ID FRO
 
 INSERT INTO MenuItems (TaskName, UrlRelativePath, IconName, ManagementAreaID) VALUES ('Manage Product Settings', '/v1/settings', 'fa-cog', (SELECT ID FROM ManagementArea WHERE Name = 'Settings'));
 INSERT INTO MenuItemsAndRoles (MenuItemID, RoleShortName) VALUES ((SELECT ID FROM MenuItems WHERE TaskName = 'Manage Product Settings'), 'products_admin');
+
+--
+-- Orders
+--
+INSERT INTO MenuItems (TaskName, UrlRelativePath, IconName, ManagementAreaID) VALUES ('View All Orders', '/v1/orders/view-all', 'fa-list', (SELECT ID FROM ManagementArea WHERE Name = 'Orders'));
+INSERT INTO MenuItemsAndRoles (MenuItemID, RoleShortName) VALUES ((SELECT ID FROM MenuItems WHERE TaskName = 'View All Orders'), 'orders_viewer');
+INSERT INTO MenuItemsAndRoles (MenuItemID, RoleShortName) VALUES ((SELECT ID FROM MenuItems WHERE TaskName = 'View All Orders'), 'orders_contributor');
+INSERT INTO MenuItemsAndRoles (MenuItemID, RoleShortName) VALUES ((SELECT ID FROM MenuItems WHERE TaskName = 'View All Orders'), 'orders_admin');
+
 
 -- =========================================================
 -- Checking data on all tables

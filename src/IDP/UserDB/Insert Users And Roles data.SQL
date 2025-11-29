@@ -47,6 +47,11 @@ INSERT INTO Roles (Name, ShortName) VALUES
 ('Products Contributor','products_contributor'),
 ('Products Administrator', 'products_admin');
 
+INSERT INTO Roles (Name, ShortName) VALUES
+('Orders Viewer', 'orders_viewer'),
+('Orders Contributor','orders_contributor'),
+('Orders Administrator', 'orders_admin');
+
 -- =========================================================
 -- Insert data into table: Users
 -- =========================================================
@@ -67,16 +72,24 @@ INSERT INTO Users (FirstName, LastName, Email, UserName, HashedPassword) VALUES
 -- =========================================================
 
 INSERT INTO UsersAndRoles (UserID, RoleID) VALUES ((SELECT ID FROM Users WHERE UserName = 'ChrisNol'), (SELECT ID FROM Roles WHERE ShortName = 'products_viewer'));
+INSERT INTO UsersAndRoles (UserID, RoleID) VALUES ((SELECT ID FROM Users WHERE UserName = 'ChrisNol'), (SELECT ID FROM Roles WHERE ShortName = 'orders_viewer'));
 
 INSERT INTO UsersAndRoles (UserID, RoleID) VALUES ((SELECT ID FROM Users WHERE UserName = 'TomHanks'), (SELECT ID FROM Roles WHERE ShortName = 'products_viewer'));
 INSERT INTO UsersAndRoles (UserID, RoleID) VALUES ((SELECT ID FROM Users WHERE UserName = 'TomHanks'), (SELECT ID FROM Roles WHERE ShortName = 'products_contributor'));
+INSERT INTO UsersAndRoles (UserID, RoleID) VALUES ((SELECT ID FROM Users WHERE UserName = 'TomHanks'), (SELECT ID FROM Roles WHERE ShortName = 'orders_viewer'));
+INSERT INTO UsersAndRoles (UserID, RoleID) VALUES ((SELECT ID FROM Users WHERE UserName = 'TomHanks'), (SELECT ID FROM Roles WHERE ShortName = 'orders_contributor'));
 
 INSERT INTO UsersAndRoles (UserID, RoleID) VALUES ((SELECT ID FROM Users WHERE UserName = 'JamesCam'), (SELECT ID FROM Roles WHERE ShortName = 'products_viewer'));
 INSERT INTO UsersAndRoles (UserID, RoleID) VALUES ((SELECT ID FROM Users WHERE UserName = 'JamesCam'), (SELECT ID FROM Roles WHERE ShortName = 'products_contributor'));
+INSERT INTO UsersAndRoles (UserID, RoleID) VALUES ((SELECT ID FROM Users WHERE UserName = 'JamesCam'), (SELECT ID FROM Roles WHERE ShortName = 'orders_viewer'));
+INSERT INTO UsersAndRoles (UserID, RoleID) VALUES ((SELECT ID FROM Users WHERE UserName = 'JamesCam'), (SELECT ID FROM Roles WHERE ShortName = 'orders_contributor'));
 
 INSERT INTO UsersAndRoles (UserID, RoleID) VALUES ((SELECT ID FROM Users WHERE UserName = 'JuliaRob'), (SELECT ID FROM Roles WHERE ShortName = 'products_viewer'));
 INSERT INTO UsersAndRoles (UserID, RoleID) VALUES ((SELECT ID FROM Users WHERE UserName = 'JuliaRob'), (SELECT ID FROM Roles WHERE ShortName = 'products_contributor'));
 INSERT INTO UsersAndRoles (UserID, RoleID) VALUES ((SELECT ID FROM Users WHERE UserName = 'JuliaRob'), (SELECT ID FROM Roles WHERE ShortName = 'products_admin'));
+INSERT INTO UsersAndRoles (UserID, RoleID) VALUES ((SELECT ID FROM Users WHERE UserName = 'JuliaRob'), (SELECT ID FROM Roles WHERE ShortName = 'orders_viewer'));
+INSERT INTO UsersAndRoles (UserID, RoleID) VALUES ((SELECT ID FROM Users WHERE UserName = 'JuliaRob'), (SELECT ID FROM Roles WHERE ShortName = 'orders_contributor'));
+INSERT INTO UsersAndRoles (UserID, RoleID) VALUES ((SELECT ID FROM Users WHERE UserName = 'JuliaRob'), (SELECT ID FROM Roles WHERE ShortName = 'orders_admin'));
 
 -- =========================================================
 -- Checking data on all tables

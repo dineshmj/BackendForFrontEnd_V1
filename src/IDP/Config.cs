@@ -19,8 +19,12 @@ public static class Config
             new (MicroserviceApiResources.PRODUCTS_API, "Products API")
             {
                 UserClaims = { "role", "name", "email" }
-            }
-        ];
+            },
+			new (MicroserviceApiResources.ORDERS_API, "Orders API")
+			{
+				UserClaims = { "role", "name", "email" }
+			}
+		];
 
     public static IEnumerable<ApiResource> ApiResources =>
         [
@@ -28,8 +32,13 @@ public static class Config
             {
                 Scopes = { MicroserviceApiResources.PRODUCTS_API },
                 UserClaims = { "role", "name", "email" }
-            }
-        ];
+            },
+		    new (MicroserviceApiResources.ORDERS_API, "Orders API")
+			{
+				Scopes = { MicroserviceApiResources.ORDERS_API },
+				UserClaims = { "role", "name", "email" }
+			}
+		];
 
     public static IEnumerable<Client> Clients =>
         [
@@ -138,6 +147,57 @@ public static class Config
 
                 RefreshTokenExpiration = TokenExpiration.Sliding,
                 SlidingRefreshTokenLifetime = 3600
+                    // 🡡__ WHY   : Sliding expiration helps keep active users authenticated without forcing frequent full re-authentication. The value
+                    //              of 3600 seconds establishes the sliding window; each successful refresh within that window extends validity.
+                    // 🡡__ IF NOT: Absolute expiration would set a hard timeout after which the refresh token is invalid regardless of usage. If sliding
+                    //              is omitted and tokens are short-lived, clients must reauthenticate more often.            
+            },
+
+            // Orders Microservice Client
+            new()
+			{
+				ClientId = OrdersMicroservice.CLIENT_ID,
+				ClientName = OrdersMicroservice.CLIENT_NAME,
+				ClientSecrets = { new Secret(OrdersMicroservice.CLIENT_SECRET.Sha256()) },
+
+				AllowedGrantTypes = GrantTypes.Code,
+                    // 🡡__ WHY   : The Products microservice (if acting as a confidential client or BFF) should use Authorization Code to keep tokens
+                    //              private on the server and to benefit from the standard OIDC/OAuth flow, including PKCE if applicable.
+                    // 🡡__ IF NOT: Using non-confidential or browser flows could expose tokens to the client-side, allowing token theft via XSS
+                    //              and making secure API access more difficult to enforce.
+
+                RedirectUris = { $"{OrdersMicroservice.CLIENT_BASE_URL}/api/auth/callback" },
+				PostLogoutRedirectUris = { $"{OrdersMicroservice.CLIENT_BASE_URL}/signout-callback-oidc" },
+				// FrontChannelLogoutUri = $"{OrdersMicroservice.CLIENT_BASE_URL }/signout-oidc",
+
+				AllowOfflineAccess = true,
+                    // 🡡__ WHY   : Products Microservice BFF frontend may need refresh tokens to maintain backend sessions or to act on behalf of the user without interactive login.
+                    //              For server-to-server or long-running operations, refresh tokens enable seamless token renewal.
+                    // 🡡__ IF NOT: Without offline access, the service cannot obtain refresh tokens and must force users to re-authenticate when access tokens expire.
+
+
+                AllowedScopes =
+				{
+					IdentityServerConstants.StandardScopes.OpenId,
+					IdentityServerConstants.StandardScopes.Profile,
+					IdentityServerConstants.StandardScopes.Email,
+					"roles",
+					MicroserviceApiResources.ORDERS_API
+                        // 🡡__ WHY   : Including the PRODUCTS_API scope permits the Products Microservice BFF client to request access tokens that include scope permissions for the
+                        //              Products Microservice API. The Products Microservice API will validate the access token and require the corresponding scope to authorize API calls.
+                        // 🡡__ IF NOT: If this scope is not included, tokens issued to the client will not be valid for calling the Products Microservice API, so Products Microservice API calls
+                        //              will be denied (insufficient scope). The microservice would not be authorized to access protected endpoints.
+                
+                },
+
+				RefreshTokenUsage = TokenUsage.ReUse,
+                    // 🡡__ WHY   : ReUse simplifies server-side handling for refresh tokens and avoids the need to implement rotation/one-time logic.
+                    //              Use ReUse for scenarios where the refresh token is stored securely and where you prefer simpler lifecycle management.
+                    // 🡡__ IF NOT: OneTimeOnly (rotation) would increase security by invalidating refresh tokens after use, but requires additional server-side
+                    //              bookkeeping and careful handling of concurrent refresh requests.
+
+                RefreshTokenExpiration = TokenExpiration.Sliding,
+				SlidingRefreshTokenLifetime = 3600
                     // 🡡__ WHY   : Sliding expiration helps keep active users authenticated without forcing frequent full re-authentication. The value
                     //              of 3600 seconds establishes the sliding window; each successful refresh within that window extends validity.
                     // 🡡__ IF NOT: Absolute expiration would set a hard timeout after which the refresh token is invalid regardless of usage. If sliding
