@@ -7,7 +7,7 @@ import Image from 'next/image';
 import { MicroserviceAccordion } from './components/MicroserviceAccordion';
 import { useAuth } from './hooks/useAuth';
 import { MenuResponse, MenuItem } from './types';
-import { addVisitedMicroservice } from './lib/auth-utils';
+import { addVisitedMicroservice, setDiscoveredMicroservices } from './lib/auth-utils';
 
 export default function Home() {
   return (
@@ -67,6 +67,9 @@ function HomeContent() {
 
       const data: MenuResponse = await response.json();
       setMenuData(data);
+
+      const allBaseUrls = data.microservices.map(ms => ms.baseURL);
+      setDiscoveredMicroservices(allBaseUrls);
     } catch (e) {
       console.error('Failed to load menu:', e);
     }

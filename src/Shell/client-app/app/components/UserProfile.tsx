@@ -1,7 +1,7 @@
 ﻿'use client';
 
 import { redirectToLogout, getUserDisplayName, type BffUser } from '../lib/auth';
-import { getVisitedMicroservices } from '../lib/auth-utils';
+import { getDiscoveredMicroservices } from '../lib/auth-utils';
 
 interface UserProfileProps {
   claims: BffUser[];
@@ -11,7 +11,7 @@ export function UserProfile({ claims }: UserProfileProps) {
   const displayName = getUserDisplayName(claims);
 
   const handleLogout = async () => {
-    const microservices = getVisitedMicroservices();
+    const microservices = getDiscoveredMicroservices();
     for (const baseURL of microservices) {
       try {
         const response = await fetch(`${baseURL}/api/auth/silent-logout`, {
