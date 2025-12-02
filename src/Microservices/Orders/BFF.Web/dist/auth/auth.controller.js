@@ -23,6 +23,7 @@ let AuthController = class AuthController {
     }
     async silentLogin(returnUrl = '/', req, res) {
         if (!this.authService.isValidReturnUrl(returnUrl)) {
+            console.log('Invalid returnUrl detected in silent-login:', returnUrl);
             const htmlContent = `
         <div style='padding:20px; border:1px solid #d0d8e8; background:#f7faff; color:#1a2c4e; border-radius:8px; font-family:Segoe UI,Roboto,sans-serif; max-width:500px;'>
           <div style='display:flex; align-items:center; font-size:18px; font-weight:600; margin-bottom:10px;'>
@@ -36,10 +37,11 @@ let AuthController = class AuthController {
             return res.status(common_1.HttpStatus.NOT_FOUND).send(htmlContent);
         }
         if (req.isAuthenticated && req.isAuthenticated()) {
-            const base = (process.env.NEXTJS_URL ?? '').replace(/\/+$/, '');
-            const spaUrl = `${base}${returnUrl}`;
+            console.log('Silent login: user is already authenticated.');
+            const spaUrl = `${process.env.NEXTJS_URL}${returnUrl}`;
             return res.redirect(spaUrl);
         }
+        console.log('Silent login: presenting `Authentication Required` message.');
         const htmlContent = `
         <div style='padding:20px; border:1px solid #d0d8e8; background:#f7faff; color:#1a2c4e; border-radius:8px; font-family:Segoe UI,Roboto,sans-serif; max-width:500px;'>
           <div style='display:flex; align-items:center; font-size:18px; font-weight:600; margin-bottom:10px;'>
@@ -56,6 +58,11 @@ let AuthController = class AuthController {
     }
     async oidcCallback(req, res) {
         req.session.bffUser = req.user;
+        const accessToken = req.user?.tokens?.accessToken;
+        if (accessToken) {
+            console.log('Storing access token in session for downstream API calls - ' + accessToken.substring(0, 10) + '...');
+            req.session.AccessToken = accessToken;
+        }
         const sessionReturnUrl = req.session?.returnUrl;
         const stateReturnUrl = req.query['state'] || undefined;
         const returnUrl = sessionReturnUrl || stateReturnUrl || '/';
@@ -67,9 +74,11 @@ let AuthController = class AuthController {
         return res.redirect(spaUrl);
     }
     async silentLogoutPost(req, res) {
+        req.session.AccessToken = null;
         return this.handleSilentLogout(req, res);
     }
     async silentLogoutGet(req, res) {
+        req.session.AccessToken = null;
         return this.handleSilentLogout(req, res);
     }
     async handleSilentLogout(req, res) {

@@ -27,7 +27,8 @@ let AuthService = class AuthService {
             return false;
         }
         const validPaths = [
-            '/v1/orders/view-all'
+            '/v1/orders/view-all',
+            '/v2/orders/view-all',
         ];
         const isValid = validPaths.some((path) => returnUrl === path || returnUrl.startsWith(path + '/'));
         return isValid;

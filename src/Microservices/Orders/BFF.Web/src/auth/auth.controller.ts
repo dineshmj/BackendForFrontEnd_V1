@@ -25,6 +25,8 @@ export class AuthController {
     @Res() res: Response,
   ) {
     if (!this.authService.isValidReturnUrl(returnUrl)) {
+      console.log('Invalid returnUrl detected in silent-login:', returnUrl);
+
       const htmlContent = `
         <div style='padding:20px; border:1px solid #d0d8e8; background:#f7faff; color:#1a2c4e; border-radius:8px; font-family:Segoe UI,Roboto,sans-serif; max-width:500px;'>
           <div style='display:flex; align-items:center; font-size:18px; font-weight:600; margin-bottom:10px;'>
@@ -41,10 +43,13 @@ export class AuthController {
 
     // If already authenticated, go straight to SPA URL
     if (req.isAuthenticated && req.isAuthenticated()) {
-      const base = (process.env.NEXTJS_URL ?? '').replace(/\/+$/, '');
-      const spaUrl = `${base}${returnUrl}`;
+      console.log('Silent login: user is already authenticated.');
+
+      const spaUrl = `${process.env.NEXTJS_URL}${returnUrl}`;
       return res.redirect(spaUrl);
     }
+
+    console.log('Silent login: presenting `Authentication Required` message.');
 
     // Fallback – should rarely hit if SilentAuthGuard is working
     const htmlContent = `
@@ -83,6 +88,13 @@ export class AuthController {
     // so we can reliably read it later in guards/controllers
     (req.session as any).bffUser = req.user;
 
+    // Explicitly persist the Access Token in the session as per legacy requirement
+    const accessToken = (req.user as any)?.tokens?.accessToken;
+    if (accessToken) {
+      console.log('Storing access token in session for downstream API calls - ' + accessToken.substring(0, 10) + '...');
+      (req.session as any).AccessToken = accessToken;
+    }
+
     // Determine return URL (from session or state)
     const sessionReturnUrl = (req.session as any)?.returnUrl as
       | string
@@ -107,6 +119,7 @@ export class AuthController {
    */
   @Post('silent-logout')
   async silentLogoutPost(@Req() req: Request, @Res() res: Response) {
+    (req.session as any).AccessToken = null;
     return this.handleSilentLogout(req, res);
   }
 
@@ -115,6 +128,7 @@ export class AuthController {
    */
   @Get('silent-logout')
   async silentLogoutGet(@Req() req: Request, @Res() res: Response) {
+    (req.session as any).AccessToken = null;
     return this.handleSilentLogout(req, res);
   }
 

@@ -14,19 +14,17 @@ import {
 } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 
-import productsReducer from './productsSlice';
-import categoriesReducer from './categoriesSlice';
+import ordersReducer from './ordersSlice';
 
 // Combine reducers
 const rootReducer = combineReducers({
-  products: productsReducer,
-  categories: categoriesReducer,
+  orders: ordersReducer
 });
 
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['products', 'categories'],
+  whitelist: ['orders'],
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

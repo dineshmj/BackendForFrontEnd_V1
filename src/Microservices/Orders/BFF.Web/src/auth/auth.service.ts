@@ -28,7 +28,8 @@ export class AuthService {
     // For example, check if the path exists in your NextJS routes
     // This is a simplified version - adjust based on your needs
     const validPaths = [
-      '/v1/orders/view-all'
+      '/v1/orders/view-all',
+      '/v2/orders/view-all',
       // Add other valid paths
     ];
 

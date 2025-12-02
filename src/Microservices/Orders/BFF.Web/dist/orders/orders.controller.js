@@ -15,12 +15,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.OrdersController = void 0;
 const common_1 = require("@nestjs/common");
 const auth_service_1 = require("../auth/auth.service");
-const session_auth_guard_1 = require("../auth/guards/session-auth.guard");
 let OrdersController = class OrdersController {
     constructor(authService) {
         this.authService = authService;
     }
     async getOrders(req) {
+        const accessToken = req.session?.AccessToken;
+        console.log('Accessing getOrders with access token:', accessToken ? accessToken.substring(0, 10) + '...' : 'none');
+        if (!accessToken) {
+            throw new common_1.HttpException('Access token not found', common_1.HttpStatus.UNAUTHORIZED);
+        }
         const orders = [
             {
                 orderId: 1001,
@@ -88,7 +92,6 @@ let OrdersController = class OrdersController {
 exports.OrdersController = OrdersController;
 __decorate([
     (0, common_1.Get)('view-all'),
-    (0, common_1.UseGuards)(session_auth_guard_1.SessionAuthGuard),
     __param(0, (0, common_1.Req)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),

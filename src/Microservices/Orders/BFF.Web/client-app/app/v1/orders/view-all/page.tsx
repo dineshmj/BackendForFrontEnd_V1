@@ -1,5 +1,8 @@
 'use client';
 
+import { config } from '../../../../app.config.json';
+
+import { HttpError } from '@/app/types';
 import React, { useState, useEffect, useRef } from 'react';
 
 // Define the expected Order structure based on mock data
@@ -39,7 +42,7 @@ const BFF_BASE_URL =
 const OrdersGetAllPage: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<HttpError | null>(null);
 
   const didFetchRef = useRef(false);
 
@@ -69,11 +72,21 @@ const OrdersGetAllPage: React.FC = () => {
       if (Array.isArray(data)) {
         setOrders(data);
       } else {
-        setError('Received unexpected data format from API.');
+        setError(new HttpError('Received unexpected data format from API.', 500));
       }
     } catch (err: any) {
-      console.error('Failed to fetch orders:', err);
-      setError(err?.message ?? 'Failed to fetch orders.');
+      // API error 401 Unauthorized: {"statusCode":401,"message":"Access token not found"}
+
+      // if err contains "401 Unauthorized", set error status to 401
+      if (err.message && (err.message.includes('401 Unauthorized') || err.message.includes('"statusCode":401'))) {
+        setError(new HttpError('User is not authenticated.', 401));
+        return;
+      }
+      else {
+        const errorMessage = err?.message ?? 'Failed to fetch orders.';
+        const errorStatus = (err as any)?.status || 500;
+        setError(new HttpError(errorMessage, errorStatus));
+      }
     } finally {
       setLoading(false);
     }
@@ -95,6 +108,19 @@ const OrdersGetAllPage: React.FC = () => {
   }
 
   if (error) {
+    if (error.statusCode === 401) {
+      return (
+        <div style={{ padding: '2rem', fontFamily: 'system-ui', textAlign: 'center' }}>
+          <h1>Authentication Required</h1>
+          
+          <p>
+            User is not authenticated. Please login from
+            <a href={process.env.PMS_LOGIN_URL} style={{ marginLeft: '0.5rem' }}>Platform Management System</a>.
+          </p>
+        </div>
+      );
+    }
+
     return (
       <div
         style={{
@@ -104,7 +130,7 @@ const OrdersGetAllPage: React.FC = () => {
           whiteSpace: 'pre-wrap',
         }}
       >
-        Error loading orders: {error}
+        Error loading orders: {error?.message}
       </div>
     );
   }
