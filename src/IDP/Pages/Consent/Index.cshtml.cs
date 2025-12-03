@@ -86,8 +86,7 @@ public sealed class Index : PageModel
                 grantedConsent = new ConsentResponse
                 {
                     RememberConsent = Input.RememberConsent,
-                    ScopesValuesConsented = scopes.ToArray(),
-                    Description = Input.Description
+                    ScopesValuesConsented = scopes.ToArray()
                 };
 
                 // Emit "consent granted" event

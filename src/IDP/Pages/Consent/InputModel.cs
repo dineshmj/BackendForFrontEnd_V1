@@ -12,6 +12,4 @@ public sealed class InputModel
     public bool RememberConsent { get; set; } = false;
 
     public string? ReturnUrl { get; set; }
-
-    public string? Description { get; set; }
 }
