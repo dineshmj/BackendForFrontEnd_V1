@@ -4,12 +4,14 @@ export interface Claim {
 }
 
 export interface Order {
-  id: string;
-  orderNumber: string;
+  orderId: number;
+  dateOfOrder: string;
+  totalAmount: number;
+  paymentMethod: string;
+  invoiceNumber: string;
+  numberOfItems: number;
   customerName: string;
-  status: string;
-  total: number;
-  createdAt: string;
+  dispatchStatus: string;
 }
 
 export interface OrdersResponse {

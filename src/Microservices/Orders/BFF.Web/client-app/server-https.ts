@@ -1,4 +1,5 @@
-// server-https.ts (or .js)
+import appConfigData from './app.config.json';
+
 import { createServer } from 'https';
 import { parse } from 'url';
 import fs from 'fs';
@@ -7,12 +8,13 @@ import next from 'next';
 
 const dev = true;
 const hostname = 'localhost';
-const port = 33500;
+const port = appConfigData.config.ordersSpaNextJsPort;
 
 const app = next({ dev, hostname, port });
 const handle = app.getRequestHandler();
 
-const certsDir = path.join(__dirname, 'certs'); // adjust path
+const certsDir = path.join(__dirname, 'certs');
+
 const httpsOptions = {
   key: fs.readFileSync(path.join(certsDir, 'localhost.key')),
   cert: fs.readFileSync(path.join(certsDir, 'localhost.crt')),
@@ -23,6 +25,6 @@ app.prepare().then(() => {
     const parsedUrl = parse(req.url!, true);
     handle(req, res, parsedUrl);
   }).listen(port, () => {
-    console.log(`✅ NextJS SPA running at https://localhost:${port}`);
+    console.log(`✅ Orders Microservice NextJS SPA running at https://localhost:${port}`);
   });
 });

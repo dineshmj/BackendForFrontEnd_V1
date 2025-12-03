@@ -1,23 +1,12 @@
 'use client';
 
-import { config } from '../../../../app.config.json';
-
-import { HttpError } from '@/app/types';
+import { HttpError, Order } from '@/app/types';
 import React, { useState, useEffect, useRef } from 'react';
+import appConfigData from '../../../../app.config.json';
 
-// Define the expected Order structure based on mock data
-interface Order {
-  orderId: number;
-  dateOfOrder: string; // ISO Date string
-  totalAmount: number;
-  paymentMethod: string;
-  invoiceNumber: string;
-  numberOfItems: number;
-  dispatchStatus: string;
-  customerName: string;
-}
-
+//
 // Utility function for date formatting: dd-MMM-yyyy
+//
 const formatDate = (dateString: string): string => {
   try {
     const options: Intl.DateTimeFormatOptions = {
@@ -26,18 +15,12 @@ const formatDate = (dateString: string): string => {
       day: '2-digit',
     };
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-GB', options).replace(/ /g, '-'); // e.g. 20-Nov-2025
+    return date.toLocaleDateString('en-GB', options).replace(/ /g, '-');
   } catch (e) {
     console.error('Date formatting failed:', e);
     return dateString;
   }
 };
-
-const BFF_BASE_URL =
-  (process.env.NEXT_PUBLIC_ORDERS_BFF_URL ?? 'https://localhost:33800').replace(
-    /\/+$/,
-    '',
-  );
 
 const OrdersGetAllPage: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -49,9 +32,9 @@ const OrdersGetAllPage: React.FC = () => {
   useEffect(() => {
   const fetchOrders = async () => {
     try {
-      const res = await fetch(`${BFF_BASE_URL}/api/orders/view-all`, {
+      const res = await fetch(`${appConfigData.config.ordersBffUrl}/api/orders/view-all`, {
         method: 'GET',
-        credentials: 'include', // important to send BFF auth cookie
+        credentials: 'include', // This ensures that the BFF auth cookie is sent back to the BFF server.
       });
 
       if (!res.ok) {
@@ -75,9 +58,9 @@ const OrdersGetAllPage: React.FC = () => {
         setError(new HttpError('Received unexpected data format from API.', 500));
       }
     } catch (err: any) {
-      // API error 401 Unauthorized: {"statusCode":401,"message":"Access token not found"}
-
-      // if err contains "401 Unauthorized", set error status to 401
+      //
+      // If error message contains "401 Unauthorized", set Response Status Code to 401
+      //
       if (err.message && (err.message.includes('401 Unauthorized') || err.message.includes('"statusCode":401'))) {
         setError(new HttpError('User is not authenticated.', 401));
         return;
@@ -85,6 +68,7 @@ const OrdersGetAllPage: React.FC = () => {
       else {
         const errorMessage = err?.message ?? 'Failed to fetch orders.';
         const errorStatus = (err as any)?.status || 500;
+
         setError(new HttpError(errorMessage, errorStatus));
       }
     } finally {
@@ -115,7 +99,7 @@ const OrdersGetAllPage: React.FC = () => {
           
           <p>
             User is not authenticated. Please login from
-            <a href={process.env.PMS_LOGIN_URL} style={{ marginLeft: '0.5rem' }}>Platform Management System</a>.
+            <a href={appConfigData.config.pmsLoginUrl} style={{ marginLeft: '0.5rem' }}>Platform Management System</a>.
           </p>
         </div>
       );
@@ -188,8 +172,11 @@ const OrdersGetAllPage: React.FC = () => {
           >
             {order.orderId}
           </div>
+
           <div>{formatDate(order.dateOfOrder)}</div>
+
           <div>$ {order.totalAmount.toFixed(2)}</div>
+
           <div
             style={{
               whiteSpace: 'nowrap',
@@ -199,6 +186,7 @@ const OrdersGetAllPage: React.FC = () => {
           >
             {order.paymentMethod}
           </div>
+
           <div
             style={{
               whiteSpace: 'nowrap',
@@ -208,8 +196,11 @@ const OrdersGetAllPage: React.FC = () => {
           >
             {order.invoiceNumber}
           </div>
+
           <div>{order.numberOfItems}</div>
+
           <div>{order.dispatchStatus}</div>
+          
           <div
             style={{
               whiteSpace: 'nowrap',

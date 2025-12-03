@@ -1,4 +1,4 @@
-﻿import { config } from '../../app.config.json';
+﻿import appConfigData from '../../app.config.json';
 
 export interface BffUser {
   type: string;
@@ -11,12 +11,12 @@ export interface AuthState {
   isLoading: boolean;
 }
 
-/*
- * Check if user is authenticated by calling BFF user endpoint
- */
+//
+// Check if the user is authenticated, by calling the BFF user endpoint.
+//
 export async function checkAuthentication(): Promise<AuthState> {
   try {
-    const response = await fetch(`"${config.ordersBffUrl}}/api/auth/user`, {
+    const response = await fetch(`"${appConfigData.config.ordersBffUrl}}/api/auth/user`, {
       credentials: 'include',
       headers: {
         'X-CSRF': '1',

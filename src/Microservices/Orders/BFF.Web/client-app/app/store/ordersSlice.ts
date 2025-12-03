@@ -1,4 +1,4 @@
-import { config } from '../../app.config.json';
+import appConfigData from '../../app.config.json'
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { Order, OrdersResponse } from '../types';
 
@@ -18,20 +18,18 @@ const initialState: OrdersState = {
 
 // Async Thunk for API call
 export const fetchOrders = createAsyncThunk<
-  OrdersResponse,
-  void,
-  { rejectValue: string }
->('orders/fetchOrders', async (_, { rejectWithValue }) => {
+    OrdersResponse,
+    void,
+    { rejectValue: string }
+  >('orders/fetchOrders', async (_, { rejectWithValue }) => {
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
 
-    // const response = await fetch(`${process.env.NEXT_PUBLIC_ORDERS_BFF_URL}/api/orders/view-all`, {
-
     // Make a BFF edge API call from the NextJS store.
-    const response = await fetch(`${config.ordersBffUrl}/api/orders/view-all`, {
+    const response = await fetch(`${appConfigData.config.ordersBffUrl}/api/orders/view-all`, {
         method: 'GET',
-        credentials: 'include', // important to send BFF auth cookie
+        credentials: 'include', // This ensures that the BFF auth cookie is sent back to the BFF server.
       });
 
     clearTimeout(timeoutId);
