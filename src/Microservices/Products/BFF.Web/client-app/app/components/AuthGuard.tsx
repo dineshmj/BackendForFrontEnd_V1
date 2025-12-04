@@ -1,7 +1,7 @@
 'use client';
 
 import { useAuth } from '../hooks/useAuth';
-import { config } from '../../app.config.json';
+import appConfigData from '../../app.config.json';
 
 interface AuthGuardProps {
   children: React.ReactNode;
@@ -18,7 +18,7 @@ export function AuthGuard({ children }: AuthGuardProps) {
   // Only render children if authenticated
   if (!isAuthenticated) {
     if (showLoginMessage) {
-      const navigateToPmsLoginUrl = config.pmsLoginUrl;
+      const navigateToPmsLoginUrl = appConfigData.config.pmsLoginUrl;
       return (
         <div style={{ padding: '2rem', fontFamily: 'system-ui', textAlign: 'center' }}>
           <h1>Authentication Required</h1>

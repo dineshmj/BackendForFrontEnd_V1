@@ -1,0 +1,66 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Start API (start:dev)",
+            "type": "shell",
+            "command": "npm run start:dev",
+           
+            "options": {
+                "cwd": "${workspaceFolder}/src"
+            },
+           
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "new",
+                "close": true,
+                "clear": true,
+                "showReuseMessage": true
+            },
+            "problemMatcher": []
+        },
+
+        {
+            "label": "Start SPA (dev:https)",
+            "type": "shell",
+            "command": "npm run dev:https",
+           
+            "options": {
+                "cwd": "${workspaceFolder}/client-app"
+            },
+           
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "new",
+                "close": true,
+                "clear": true,
+                "showReuseMessage": true
+            },
+            "problemMatcher": []
+        },
+
+        {
+            "label": "Start All Orders Services",
+            "dependsOn": [
+                "Start API (start:dev)",
+                "Start SPA (dev:https)"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "never"
+            },
+            "problemMatcher": []
+        }
+    ]
+}
