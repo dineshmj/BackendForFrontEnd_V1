@@ -43,3 +43,4 @@
 /src/Microservices/Orders/BFF.Web/client-app/node_modules
 /src/Microservices/Orders/BFF.Web/node_modules
 /src/Microservices/Orders/BFF.Web/complete_project_guide.md
+/src/Microservices/Orders/API/bin/Debug/net10.0
