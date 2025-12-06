@@ -25,29 +25,18 @@ let OrdersController = class OrdersController {
         if (!accessToken) {
             throw new common_1.HttpException('Access token not found', common_1.HttpStatus.UNAUTHORIZED);
         }
-        const orders = [
-            {
-                orderId: 1001,
-                dateOfOrder: '2025-11-20T10:00:00Z',
-                totalAmount: 150.75,
-                paymentMethod: 'Credit Card',
-                invoiceNumber: 'INV-1001',
-                numberOfItems: 3,
-                dispatchStatus: 'Shipped',
-                customerName: 'John Doe',
-            },
-            {
-                orderId: 1002,
-                dateOfOrder: '2025-11-21T15:30:00Z',
-                totalAmount: 89.99,
-                paymentMethod: 'UPI',
-                invoiceNumber: 'INV-1002',
-                numberOfItems: 1,
-                dispatchStatus: 'Processing',
-                customerName: 'Jane Smith',
-            },
-        ];
-        return orders;
+        const ordersMicroserviceApiUrl = process.env.ORDERS_MICROSERVICE_API_URL;
+        const graphQLQuery = {
+            query: '{ orderReport { nodes { orderId dateOfOrder totalAmount paymentMethod invoiceNumber numberOfItems dispatchStatus customerName } } }'
+        };
+        const response = await this.authService.callDownstreamApi(accessToken, `${ordersMicroserviceApiUrl}/graphql`, {
+            method: 'POST',
+            body: JSON.stringify(graphQLQuery),
+        });
+        if (!response.ok) {
+            throw new common_1.HttpException('Failed to fetch order', response.status);
+        }
+        return response.json();
     }
     async getOrderById(id, req) {
         try {
@@ -56,8 +45,8 @@ let OrdersController = class OrdersController {
             if (!accessToken) {
                 throw new common_1.HttpException('Access token not found', common_1.HttpStatus.UNAUTHORIZED);
             }
-            const ordersApiUrl = process.env.ORDERS_API_URL;
-            const response = await this.authService.callDownstreamApi(accessToken, `${ordersApiUrl}/api/orders/${id}`, { method: 'GET' });
+            const ordersMicroserviceApiUrl = process.env.ORDERS_MICROSERVICE_API_URL;
+            const response = await this.authService.callDownstreamApi(accessToken, `${ordersMicroserviceApiUrl}/api/orders/${id}`, { method: 'GET' });
             if (!response.ok) {
                 throw new common_1.HttpException('Failed to fetch order', response.status);
             }
@@ -74,8 +63,8 @@ let OrdersController = class OrdersController {
             if (!accessToken) {
                 throw new common_1.HttpException('Access token not found', common_1.HttpStatus.UNAUTHORIZED);
             }
-            const ordersApiUrl = process.env.ORDERS_API_URL;
-            const response = await this.authService.callDownstreamApi(accessToken, `${ordersApiUrl}/api/orders`, {
+            const ordersMicroserviceApiUrl = process.env.ORDERS_MICROSERVICE_API_URL;
+            const response = await this.authService.callDownstreamApi(accessToken, `${ordersMicroserviceApiUrl}/api/orders`, {
                 method: 'POST',
                 body: JSON.stringify(orderData),
             });

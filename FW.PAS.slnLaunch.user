@@ -8,6 +8,11 @@
         "DebugTarget": "SelfHost"
       },
       {
+        "Path": "src\\Microservices\\Orders\\API\\FW.Microservices.Orders.API.csproj",
+        "Action": "Start",
+        "DebugTarget": "IIS Express"
+      },
+      {
         "Path": "src\\Microservices\\Products\\API\\FW.Microservices.Products.API.csproj",
         "Action": "Start",
         "DebugTarget": "IIS Express"

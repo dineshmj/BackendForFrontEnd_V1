@@ -42,7 +42,7 @@ public static class Config
 
     public static IEnumerable<Client> Clients =>
         [
-            // Shell BFF Client
+            // Shell BFF Client (BFF using ASP.NET Core 10)
             new()
             {
                 ClientId = PASShellBFF.CLIENT_ID,
@@ -102,7 +102,7 @@ public static class Config
 
             },
 
-            // Products Microservice Client
+            // Products Microservice Client (BFF using ASP.NET Core 10)
             new()
             {
                 ClientId = ProductsMicroservice.CLIENT_ID,
@@ -153,7 +153,7 @@ public static class Config
                     //              is omitted and tokens are short-lived, clients must reauthenticate more often.            
             },
 
-            // Orders Microservice Client
+            // Orders Microservice Client (BFF using NestJS, and not ASP.NET Core 10).
             new()
 			{
 				ClientId = OrdersMicroservice.CLIENT_ID,

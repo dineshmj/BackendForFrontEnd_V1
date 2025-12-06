@@ -51,9 +51,10 @@ const OrdersGetAllPage: React.FC = () => {
       }
 
       const data = await res.json();
+      const ordersData: Order[] = data.data.orderReport.nodes;
 
-      if (Array.isArray(data)) {
-        setOrders(data);
+      if (Array.isArray(ordersData)) {
+        setOrders(ordersData);
       } else {
         setError(new HttpError('Received unexpected data format from API.', 500));
       }
