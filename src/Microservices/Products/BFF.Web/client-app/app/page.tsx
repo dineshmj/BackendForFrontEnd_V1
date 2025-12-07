@@ -1,9 +1,9 @@
 'use client';
 
-import { config } from '../app.config.json';
+import appConfigData from '../app.config.json';
 
 export default function Home() {
-  const pmsLoginUrl = config.pmsLoginUrl;
+  const pmsLoginUrl = appConfigData.config.pmsLoginUrl;
   return (
     <div style={{ padding: '2rem', fontFamily: 'system-ui' }}>
       <h1>Products Microservice</h1>
