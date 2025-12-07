@@ -1,41 +1,101 @@
-1) The Shell SPA and Products Microservice SPA use Next.js 14 with the app directory structure.
+1) Technology Stack:
 
-2) The NextJS SPA projects are built and exported ("npm run export") as static files under the ASP.NET Core 8.0 BFF. Please see the "out" folder where the final static files can be found.
+	a) Duende IdentityServer 7 based IDP that runs on ASP.NET Core 10.
+		- Has its own user database using SQLite (.db file under the UserDB folder).
+		- Supports OpenID Connect and OAuth 2.0 protocols.
+		- Supports grant type: Authorization Code Flow with PKCE.
+		- Supports refresh tokens.
+		- Supports role-based authorization using role claims in the ID Token and Access Token.
+		- Supports Consent page.
 
-3) The "Backend for Frontend" (BFF) server is implemented using ASP.NET Core 8.0. The BFF server serves the static files from the "out" folder mentioned above and handles API requests from the SPA's TypeScript code.
+	b) Platform Administration System (PAS) Shell SPA Frontend
+		- Runs on Next.js 14 with app directory structure.
+		- Uses ASP.NET Core 10.0 as the Backend for Frontend (BFF) server.
 
-4) Once the .NET soltuion loads for the first time, you must configure "Configure Startup Projects..." to start multiple projects. The order in which they must run is as below:
-	1. IDP
-	2. Products Microservice API
-	3. ... all other Microservice APIs
-	4. Products Microservice BFF Frontend
-	5. ... all other Microservice BFF Frontends
-	5. PAS Shell BFF Frontend
+	c) Microservices:
 
-5) Before running the solution, make it a practice to delete all Cookies that were created by the browser for the last 24 hours.
-	- Edge browser --> Settings --> Privacy, Search & Services --> Clear Browsing data > Choose what to clear --> Time Range: Last 24 hours --> [Clear Now]
+		1) Products Microservice
+			- SPA Frontend: Next.js 14 with app directory structure.
+			- BFF Server: ASP.NET Core 10.0 with REST response.
+			- API Server: ASP.NET Core 10.0 with REST response.
 
-6) Once the solution is run, go to "System Tray", locate the IIS Express icon, and locate the Shell BFF server (https). Click the URL with https:// to launch the Shell SPA Frontend in your default web browser.
+		2) Orders Microservice
+			- SPA Frontend: Next.js 14 with app directory structure.
+			- BFF Server: Nest.js 10.0 with REST response.
+			- API Server: ASP.NET Core 10.0 with GraphQL response.
 
-7) Since the Shell BFF project is protected by the IDP, the browser will redirect you to the IDP login page. Enter "JuliaRob" and "JuliaRob123" as credentials to log in. User Julia Roberts has the highest number of role claims.
+		3) Payments Microservice (yet to be implemented)
+			- SPA Frontend: React.js 18.
+			- BFF Server: Python / Flask BFF server with REST response.
+			- API Server: Nest.js 10.0 with GraphQL response.
 
-8) After successful login at the IDP login page, the browser will be redirected back to the Shell BFF Frontend application, and the browser will show the landing page of the Shell BFF Frontend.
+2) What to do after cloning the repository:
+	a) Open PowerShell ISE IDE and run the PowerShell script "CompileAndExportBFFClients.ps1" at the repository root folder. This will:
+		1) Run "npm install" for:
+			- PAS Shell BFF Frontend (Next.js)
+			- Products Microservice SPA Frontend (Next.js)
+			- Orders Microservice SPA Frontend (Next.js)
+			- Orders Microservice BFF Server (Nest.js)
 
-9) Based on the signed in user's roles (associated with the credentials), the left pane will show the available "Microservices", and various "Management Areas" under the Microservices, and under each "Management Area", you will see various "Menu Item" which takes you to the screen that does that task.
+		2) Build and export the NextJS SPA projects as static files to the "out" folder under the "app" folder, under their respective ASP.NET Core BFF projects.
+			- PAS Shell SPA Frontend
+			- Products Microservice SPA Frontend.
 
-10) Only the Products microservice has been built as on 21-NOV-2025 (in NextJS). The Payments microservice shall be in ReactJS, and the Orders microservice will be in ASP.NET Core 8.0 Blazer.
+		3) Invoke the Visual Studio Code IDE to open the BFF.Web folder of the "Orders" Microservice:
+			- Open Terminal 1 at location "BFF.Web", and run the ".\buildnow.bat" to run the Nest.js BFF application.
+			- Open Terminal 2 at location "BFF.Web\client-app" and run ".\buildnow.bat" to run the NextJS SPA application.
 
-11) The sign out from the Shell BFF application shall sign out the user from all involved Microservice BFF Frontends relevant for the browser.
+	b) Open the "FW.PAS.sln" solution file in Visual Studio 2025 IDE.
 
-12) Known issues:
-   - When logged out of the PAS system, the Products microservice's default route is still accessible. All other functional routes are secured with "Authentication required" message.
-   - When you click on a menu item for which a NextJS component page is not available, it shows empty white screen in the content area (not a bug, but a graceful message is not yet implemented).
+		- Right-click on the solution node in the Solution Explorer and select "Restore NuGet Packages".
+		- Right-click on the solution node in the Solution Explorer and choose "Configure Startup Projects...", and ensure that "Multiple startup projects" is selected with the following order:
 
-13) Final touches required (not urgent, only after all modules are implemented):
-   - A "consent" page must be implemented in the IDP to ask users for consent before sharing their profile data with the BFF UIs and APIs.
+			1) IDP - Start - self-hosted.
+			2) Products Microservice API - Start - IIS Express.
+			3) Orders Microservice API - Start - IIS Express.
+			4) Products Microservice BFF Frontend - Start - IIS Express.
+			5) (Note! The Orders Microservice BFF Frontend is a Nest.js application that must be started separately in VS Code).
+			6) PAS Shell BFF Frontend - Start - IIS Express.
+
+	c) Run the "FW.PAS.sln" solution in Debug mode (F5).
+
+		- Since the IDP project is "self-hosted", a console window will open for the IDP project, showing logs.
+		- The IDP shall be running at the default Duende IdentityServer port, which is 44392 (https://localhost:44392).
+
+	d) Open the web browser, and ensure that cookies and history ("from all time") are cleared before starting the testing.
+
+	e) Navigate to the URL of the PAS Shell BFF Frontend application at "https://localhost:44367". The expected behavior:
+
+		- Since "authentication cookie" is not present in the request from the web browser, the Shell BFF server will redirect the browser to the IDP login page at "https://localhost:44392".
+		- The browser gets a 302 - Redirect response from the Shell BFF server, and navigates to the IDP login page.
+		- The user is presented with the IDP login page.
+		- The user enters the credentials for "JuliaRob" user:
+			- Username: JuliaRob
+			- Password: JuliaRob123
+		- After successful login, the IDP presents the "consent" page to the user, asking for consent to share profile data with the Shell BFF application.
+		- After giving consent, the IDP redirects the browser back to the Shell BFF's "callback" endpoint with an authorization code.
+		- The browser gets a 302 - Redirect response from the IDP, and navigates to the Shell BFF's "callback" endpoint.
+		- The browser navigates to the Shell BFF's "callback" endpoint with the "authorization code" in the query string (which is PKCE protected).
+		- The Shell BFF server exchanges the authorization code for ID Token and Access Token from the IDP.
+		- Once the ID and Access Tokens are received, the Shell BFF extracts the "claims" and "scopes" from the tokens, and creates an authentication cookie for the user.
+		- The Shell BFF server returns a 200 - OK with the contents of the landing page along with the authentication cookie in the response.
+		- The browser displays the landing page of the Shell BFF Frontend application.
+			* In all subsequent requests from the browser to the Shell BFF server, the authentication cookie is sent along with the request, and the user is authenticated and authorized based on the roles present in the claims.
+		- The left-pane of the Shell BFF Frontend application shows the available Microservices and Management Areas based on the user's roles.
+		- When clicked on a menu item, a JavaScript in the Shell BFF application sets an iFrame's "src" attribute to the URL of the respective Microservice BFF Frontend application.
+			* This Microservice BFF Frontend URL will try to perform a silent authentication using the existing session at the IDP (since the IDP cookie is also present in the browser).
+		- Once the silent authentication is successful, the Microservice BFF Frontend application creates its own authentication cookie for the user, and presents the page requested in the iFrame.
+
+	f) The following are the logout behavior:
+		- When the user clicks on the "Sign Out" button in the Shell BFF Frontend application, the Shell BFF server clears its authentication cookie, and redirects the browser to the IDP's "end session" endpoint.
+		- Before doing the above step, the Shell BFF server also sends a back-channel logout request to all involved Microservice BFF Frontend applications to do a "silent-logout, and clear their authentication cookies for the user.
+		- The IDP clears its session cookie, and presents a logout confirmation page to the user.
+		- After confirming logout, the IDP redirects the browser to the login page.
+
+3) Final touches required (not urgent, only after all modules are implemented):
    - Teraform scripts must be written to provision all required infrastructure in a cloud provider (e.g., Azure, AWS, GCP).
 
-14) Important Gotchas and relevant URLs:
+4) Important Gotchas and relevant URLs:
 	- Cookie names of BFF projects must begin with "__". If not, there can be issues with signing in and out.
 		- Shell BFF UI cookie name: "__PAS-Shell-Host-bff"
 		- Products BFF UI cookie name: "__PAS-Microservice-Products-Host-bff"
