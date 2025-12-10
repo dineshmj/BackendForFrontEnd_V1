@@ -1,12 +1,19 @@
 {
   "profiles": {
     "IIS Express": {
-      "commandName": "Project",
-      "launchBrowser": false,
+      "commandName": "IISExpress",
+      "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-      },
-      "applicationUrl": "https://localhost:33999"
+      }
+    }
+  },
+  "iisSettings": {
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
+    "iisExpress": {
+      "applicationUrl": "http://localhost:8812/",
+      "sslPort": 44380
     }
   }
 }
